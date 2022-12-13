@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -19,11 +20,14 @@ var result = models.Result{
 // TODO add CMD.
 // TODO make this a linter for megalinter.
 func main() {
+	start := time.Now()
 	readmeFiles := extractReadmeFiles()
 
 	extractLinksFromReadmes(readmeFiles)
 	wg.Wait()
 	result.Print()
+	end := time.Now()
+	println("Time elapsed: " + end.Sub(start).String())
 }
 
 func extractLinksFromReadmes(files []string) {
