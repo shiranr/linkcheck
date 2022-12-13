@@ -18,6 +18,8 @@ var result = models.Result{
 	FilesLinksMap: map[string]*models.FileLink{},
 }
 
+// TODO add CMD.
+// TODO make this a linter for megalinter.
 func main() {
 	readmeFiles := extractReadmeFiles()
 

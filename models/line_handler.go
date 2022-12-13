@@ -13,15 +13,10 @@ type lineHandler struct {
 	regex *regexp.Regexp
 }
 
+// TODO move this to configuration
 var excludeLinks = []string{
 	"http://127.0.0.1:10000",
 	"http://127.0.0.1:10001",
-	"http://link-to-work-item",
-	"https://servicename.net",
-	"https://akamai.bintray.com",
-	"http://link-to-task-work-item",
-	"https://en.wikipedia.org/wiki/INVEST_",
-	"http://link-to-feature-or-story-work-item",
 }
 
 func GetInstance() *lineHandler {
