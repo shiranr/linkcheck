@@ -2,11 +2,9 @@ package models
 
 import (
 	"bufio"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 type FileData struct {
@@ -32,18 +30,6 @@ func (fileData *FileData) FolderPath() string {
 
 func (fileData *FileData) FullFilePath() string {
 	return path.Join(fileData.folderPath, fileData.fileName)
-}
-
-func (fileData *FileData) EscapedFullPath(extension string) string {
-	folderPath := fileData.folderPath
-	if strings.HasPrefix(extension, "#") {
-		folderPath = path.Join(fileData.folderPath, fileData.fileName)
-	} else if strings.Contains(extension, "#") {
-		fileName := strings.Split(extension, "#")[0]
-		folderPath = path.Join(fileData.folderPath, fileName)
-	}
-	folderPath, _ = url.PathUnescape(folderPath)
-	return folderPath
 }
 
 func (fileData *FileData) File() *os.File {

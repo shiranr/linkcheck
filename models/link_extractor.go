@@ -7,9 +7,9 @@ import (
 
 var link = "\\[.*\\]\\(.*\\)|https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
 
-var handler *lineHandler
+var extractor *linkExtractor
 
-type lineHandler struct {
+type linkExtractor struct {
 	regex *regexp.Regexp
 }
 
@@ -19,34 +19,34 @@ var excludeLinks = []string{
 	"http://127.0.0.1:10001",
 }
 
-func GetInstance() *lineHandler {
-	regex, _ := regexp.Compile(link)
-	if handler == nil {
-		handler = &lineHandler{
+func GetLinkExtractorInstance() *linkExtractor {
+	if extractor == nil {
+		regex, _ := regexp.Compile(link)
+		extractor = &linkExtractor{
 			regex: regex,
 		}
 	}
-	return handler
+	return extractor
 
 }
 
-func (handler *lineHandler) FindAndCheckLinksInLine(path string) []string {
+func (extractor *linkExtractor) FindAndGetLinks(path string) []string {
 	var linksPaths []string
 	var validPaths []string
-	linksPaths = append(linksPaths, handler.regex.FindAllString(path, -1)...)
+	linksPaths = append(linksPaths, extractor.regex.FindAllString(path, -1)...)
 	for _, linkPath := range linksPaths {
 		if strings.Contains(linkPath, "](") {
 			linkPath = strings.Split(linkPath, "](")[1]
 		}
 		linkPath = strings.Split(linkPath, ")")[0]
-		if !handler.isExcluded(linkPath) {
+		if !extractor.isExcluded(linkPath) {
 			validPaths = append(validPaths, linkPath)
 		}
 	}
 	return validPaths
 }
 
-func (handler *lineHandler) isExcluded(link string) bool {
+func (extractor *linkExtractor) isExcluded(link string) bool {
 	for _, excludedPath := range excludeLinks {
 		if strings.HasPrefix(link, excludedPath) {
 			return true
