@@ -7,10 +7,10 @@ import (
 
 type FileLink struct {
 	FilePath string
-	Links    []Link
+	Links    []*Link
 }
 
-func (fileLink *FileLink) append(link Link) {
+func (fileLink *FileLink) append(link *Link) {
 	fileLink.Links = append(fileLink.Links, link)
 }
 
@@ -40,7 +40,7 @@ func (result *Result) AddNewFile(fileLink *FileLink) {
 	result.FilesLinksMap[fileLink.FilePath] = fileLink
 }
 
-func (result *Result) Append(link Link, filePath string) {
+func (result *Result) Append(link *Link, filePath string) {
 	result.MapLock.Lock()
 	defer result.MapLock.Unlock()
 	result.FilesLinksMap[filePath].append(link)

@@ -1,18 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"linkcheck/models"
-
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
+var lineHandler = models.GetInstance()
 
 var result = models.Result{
 	FilesLinksMap: map[string]*models.FileLink{},
@@ -37,55 +37,36 @@ func handleFile(filePath string) {
 	defer wg.Done()
 	fileLinkData := models.FileLink{
 		FilePath: filePath,
-		Links:    []models.Link{},
+		Links:    []*models.Link{},
 	}
 	result.AddNewFile(&fileLinkData)
-	fileBytes, err := os.Open(filePath)
-	defer fileBytes.Close()
-	scanner := bufio.NewScanner(fileBytes)
-
-	lineNumber := 1
-	for scanner.Scan() {
-		lineText := scanner.Text()
-		findAndCheckLinksInLine(filePath, lineText, lineNumber)
-		lineNumber++
-	}
+	fileData, err := models.NewFileData(filePath)
 	if err != nil {
-		println("Failed to read file " + filePath + " " + err.Error())
+		return
+	}
+	lineText, lineNumber := fileData.ScanOneLine()
+	for lineNumber != -1 {
+		linksPaths := lineHandler.FindAndCheckLinksInLine(lineText)
+		for _, linkPath := range linksPaths {
+			linkData := &models.Link{
+				LineNumber: lineNumber,
+				Status:     0,
+				Path:       linkPath,
+			}
+			wg.Add(1)
+			go checkLink(fileData, linkData)
+		}
+		lineText, lineNumber = fileData.ScanOneLine()
 	}
 }
 
-func findAndCheckLinksInLine(filePath string, line string, lineNumber int) {
-	var linksPaths []string
-	linkRegex, _ := regexp.Compile("\\[.*\\]\\(.*\\)|https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)")
-	linksPaths = append(linksPaths, linkRegex.FindAllString(line, -1)...)
-	for index, linkPath := range linksPaths {
-		if strings.Contains(linkPath, "](") {
-			linkPath = strings.Split(linkPath, "](")[1]
-		}
-		linkPath = strings.Split(linkPath, ")")[0]
-		linksPaths[index] = linkPath
-	}
-	for _, linkPath := range linksPaths {
-		wg.Add(1)
-		linkData := models.Link{
-			LineNumber: lineNumber,
-			Status:     0,
-			Path:       linkPath,
-		}
-		go checkLink(filePath, linkData)
-	}
-}
-
-func checkLink(filePath string, linkData models.Link) {
+func checkLink(fileData *models.FileData, linkData *models.Link) {
 	defer wg.Done()
 	switch {
-	case strings.Contains(linkData.Path, "http"):
+	case strings.HasPrefix(linkData.Path, "http"):
 		linkData.LinkType = models.URL
 		var err error
-		resp, err := &http.Response{
-			StatusCode: 200,
-		}, nil //http.Get(linkData.path)
+		resp, err := httpRequest(linkData.Path)
 		if err != nil {
 			println("Failed to get URL data with path " + linkData.Path + " and error " + err.Error())
 			if strings.Contains(err.Error(), "timeout") {
@@ -95,7 +76,7 @@ func checkLink(filePath string, linkData models.Link) {
 		if resp != nil {
 			linkData.Status = resp.StatusCode
 		}
-	case strings.Contains(linkData.Path, "mailto:"):
+	case strings.HasPrefix(linkData.Path, "mailto:"):
 		linkData.LinkType = models.Email
 		mailRegex, _ := regexp.Compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
 		email := strings.Split(linkData.Path, ":")[0]
@@ -106,16 +87,15 @@ func checkLink(filePath string, linkData models.Link) {
 		linkData.Status = 200
 	default:
 		linkData.LinkType = models.Folder
-		folderPath, _ := filepath.Split(filePath)
-		pathWithoutTitleLink := strings.Split(linkData.Path, "#")[0]
-		folderPath = filepath.Join(folderPath, pathWithoutTitleLink)
-		fileBytes, err := os.ReadFile(folderPath)
+		linkedFileEscapedFullPath := fileData.EscapedFullPath(linkData.Path)
+		_, err := os.Stat(linkedFileEscapedFullPath)
 		if err != nil {
 			linkData.Status = 400
 			println("Failed to get link data with path " + linkData.Path + " and error " + err.Error())
 			return
 		}
 		if strings.Contains(linkData.Path, "#") {
+			fileBytes, _ := os.ReadFile(linkedFileEscapedFullPath)
 			fileData := string(fileBytes)
 			if !fileContainsLink(linkData.Path, fileData) {
 				linkData.Status = 400
@@ -124,6 +104,23 @@ func checkLink(filePath string, linkData models.Link) {
 		}
 		linkData.Status = 200
 	}
+	result.Append(linkData, fileData.FullFilePath())
+}
+
+func httpRequest(link string) (*http.Response, error) {
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	req, err := http.NewRequest("HEAD", link, nil)
+	req.Header.Set("User-Agent", "Golang_Link_Check/1.0")
+	resp, err := client.Do(req)
+	for i := 0; i < 2 && ((resp == nil && err != nil) || (resp != nil && resp.StatusCode == 404 || resp.StatusCode == 403)); i++ {
+		req, err = http.NewRequest("GET", link, nil)
+		req.Header.Set("User-Agent", "Golang_Link_Check/1.0")
+		resp, err = client.Do(req)
+	}
+	return resp, err
 }
 
 func fileContainsLink(titleLink string, fileText string) bool {
@@ -139,9 +136,8 @@ func fileContainsLink(titleLink string, fileText string) bool {
 }
 
 func extractReadmeFiles() []string {
-	path := ""
+	path := "./"
 	var readmeFiles []string
-
 	if envPath := os.Getenv("PROJECT_PATH"); envPath != "" {
 		path = envPath
 	}
