@@ -14,12 +14,6 @@ type linkExtractor struct {
 	regex *regexp.Regexp
 }
 
-// TODO move this to configuration
-var excludeLinks = []string{
-	"http://127.0.0.1:10000",
-	"http://127.0.0.1:10001",
-}
-
 func GetLinkExtractorInstance() *linkExtractor {
 	if extractor == nil {
 		regex, _ := regexp.Compile(link)

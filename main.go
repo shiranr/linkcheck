@@ -21,6 +21,7 @@ var result = models.Result{
 // TODO add tests.
 // TODO add CMD.
 // TODO make this a linter for megalinter.
+// TODO add workflow
 func main() {
 	start := time.Now()
 	getConfiguration()
