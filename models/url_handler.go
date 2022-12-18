@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"net"
 	"net/http"
 	"strings"
@@ -19,8 +20,7 @@ type urlHandler struct {
 
 func GetURLHandlerInstance() *urlHandler {
 	if handler == nil {
-		// TODO make configurable
-		timeout := time.Duration(30 * time.Second)
+		timeout := viper.GetDuration("client_timeout")
 		transport := http.DefaultTransport.(*http.Transport).Clone()
 		transport.MaxIdleConns = 1000
 		transport.IdleConnTimeout = timeout

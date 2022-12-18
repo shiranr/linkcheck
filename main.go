@@ -2,6 +2,7 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"linkcheck/models"
 	"os"
 	"path/filepath"
@@ -22,12 +23,23 @@ var result = models.Result{
 // TODO make this a linter for megalinter.
 func main() {
 	start := time.Now()
+	getConfiguration()
 	readmeFiles := extractReadmeFiles()
 	extractLinksFromReadmes(readmeFiles)
 	wg.Wait()
 	result.Print()
 	end := time.Now()
 	log.Info("Time elapsed: " + end.Sub(start).String())
+}
+
+func getConfiguration() {
+	viper.SetConfigName("linkcheck.json")
+	viper.AddConfigPath("./configuration")
+	if err := viper.ReadInConfig(); err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("Failed to load configuration")
+	}
 }
 
 func extractLinksFromReadmes(files []string) {
@@ -81,9 +93,7 @@ func checkLink(fileData *models.FileData, linkData *models.Link) {
 }
 
 func extractReadmeFiles() []string {
-	// TODO configurable
-	//path := "/Users/shiranrubin/work/github.com/microsoft/code-with-engineering-playbook/docs"
-	path := "./"
+	path := viper.GetString("path")
 	var readmeFiles []string
 	if envPath := os.Getenv("PROJECT_PATH"); envPath != "" {
 		path = envPath
@@ -100,7 +110,9 @@ func extractReadmeFiles() []string {
 	})
 
 	if err != nil {
-		log.Error("Failed to get files with error " + err.Error())
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("Failed to get files")
 	}
 	return readmeFiles
 }

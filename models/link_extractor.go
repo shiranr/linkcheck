@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/spf13/viper"
 	"regexp"
 	"strings"
 )
@@ -47,7 +48,7 @@ func (extractor *linkExtractor) FindAndGetLinks(path string) []string {
 }
 
 func (extractor *linkExtractor) isExcluded(link string) bool {
-	for _, excludedPath := range excludeLinks {
+	for _, excludedPath := range viper.GetStringSlice("exclude_links") {
 		if strings.HasPrefix(link, excludedPath) {
 			return true
 		}
