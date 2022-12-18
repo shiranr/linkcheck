@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
 	"linkcheck/models"
 	"os"
 	"path/filepath"
@@ -22,12 +23,11 @@ var result = models.Result{
 func main() {
 	start := time.Now()
 	readmeFiles := extractReadmeFiles()
-
 	extractLinksFromReadmes(readmeFiles)
 	wg.Wait()
 	result.Print()
 	end := time.Now()
-	println("Time elapsed: " + end.Sub(start).String())
+	log.Info("Time elapsed: " + end.Sub(start).String())
 }
 
 func extractLinksFromReadmes(files []string) {
@@ -74,13 +74,15 @@ func checkLink(fileData *models.FileData, linkData *models.Link) {
 		emailHandler := models.GetEmailHandlerInstance()
 		emailHandler.Handle(linkData)
 	default:
-		fileLinkHandler := models.GetfileLinkHandler(fileData)
+		fileLinkHandler := models.GetFileLinkHandler(fileData)
 		fileLinkHandler.Handle(linkData)
 	}
 	result.Append(linkData, fileData.FullFilePath())
 }
 
 func extractReadmeFiles() []string {
+	// TODO configurable
+	//path := "/Users/shiranrubin/work/github.com/microsoft/code-with-engineering-playbook/docs"
 	path := "./"
 	var readmeFiles []string
 	if envPath := os.Getenv("PROJECT_PATH"); envPath != "" {
@@ -98,7 +100,7 @@ func extractReadmeFiles() []string {
 	})
 
 	if err != nil {
-		println("Failed to get files with error " + err.Error())
+		log.Error("Failed to get files with error " + err.Error())
 	}
 	return readmeFiles
 }

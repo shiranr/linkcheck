@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"sync"
 )
@@ -48,12 +49,12 @@ func (result *Result) Append(link *Link, filePath string) {
 
 func (result *Result) Print() {
 	for key, val := range result.FilesLinksMap {
-		println("****************************")
-		println("Results for file " + key)
-		println("")
+		log.Info("****************************")
+		log.Info("Results for file " + key)
+		log.Info("")
 		for _, link := range val.Links {
-			println("Line " + strconv.Itoa(link.LineNumber) + " link " + link.Path + " status " + strconv.Itoa(link.Status))
-			println("")
+			log.Info("Line " + strconv.Itoa(link.LineNumber) + " link " + link.Path + " status " + strconv.Itoa(link.Status))
+			log.Info("")
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"net/url"
 	"os"
 	"path"
@@ -16,7 +17,7 @@ type fileLinkHandler struct {
 	fileData *FileData
 }
 
-func GetfileLinkHandler(data *FileData) *fileLinkHandler {
+func GetFileLinkHandler(data *FileData) *fileLinkHandler {
 	fileHandler = &fileLinkHandler{
 		fileData: data,
 	}
@@ -29,7 +30,10 @@ func (handler *fileLinkHandler) Handle(linkData *Link) {
 	_, err := os.Stat(linkedFileEscapedFullPath)
 	if err != nil {
 		linkData.Status = 400
-		println("Failed to get link data with path " + linkData.Path + " and error " + err.Error())
+		log.WithFields(log.Fields{
+			"link":  linkData.Path,
+			"error": err,
+		}).Error("Failed to get link data")
 		return
 	}
 	if strings.Contains(linkData.Path, "#") {

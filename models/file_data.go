@@ -2,6 +2,7 @@ package models
 
 import (
 	"bufio"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
 	"path/filepath"
@@ -40,7 +41,10 @@ func NewFileData(path string) (*FileData, error) {
 	fileData := &FileData{}
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		println("Failed to read file " + path + " " + err.Error())
+		log.WithFields(log.Fields{
+			"path":  path,
+			"error": err,
+		}).Error("Failed to read file")
 		return nil, err
 	}
 	if fileInfo.IsDir() {
