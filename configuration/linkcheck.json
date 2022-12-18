@@ -1,7 +1,6 @@
 {
   "client_timeout": "30s",
   "path": "./",
-  "backup_path": "/Users/shiranrubin/work/github.com/microsoft/code-with-engineering-playbook/docs",
   "exclude_links": [
     "http://127.0.0.1:10000",
     "http://127.0.0.1:10001"
