@@ -3,9 +3,11 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"io"
 	"linkcheck/models"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -24,7 +26,15 @@ var result = models.Result{
 // TODO add workflow
 func main() {
 	start := time.Now()
-	getConfiguration()
+	loadConfiguration()
+	outputPath := viper.GetString("output_path")
+	logFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).
+			Fatal("Failed to open log file.")
+	}
+	multiWriter := io.MultiWriter(logFile, os.Stdout)
+	log.SetOutput(multiWriter)
 	readmeFiles := extractReadmeFiles()
 	extractLinksFromReadmes(readmeFiles)
 	wg.Wait()
@@ -33,13 +43,16 @@ func main() {
 	log.Info("Time elapsed: " + end.Sub(start).String())
 }
 
-func getConfiguration() {
+func loadConfiguration() {
 	viper.SetConfigName("linkcheck.json")
-	viper.AddConfigPath("./configuration")
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	viper.AddConfigPath(basepath + "/configuration")
+	viper.SetConfigType("json")
 	if err := viper.ReadInConfig(); err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Error("Failed to load configuration")
+		}).Fatal("Failed to load configuration")
 	}
 }
 

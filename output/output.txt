@@ -1,0 +1,53 @@
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed to perform request" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed get URL data" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed to perform request" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed get URL data" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed to perform request" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:14:06+02:00" level=error msg="Failed get URL data" error="Head \"https://test.com\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)" link="https://test.com"
+time="2022-12-19T09:16:17+02:00" level=info msg="****************************"
+time="2022-12-19T09:16:17+02:00" level=info msg="Results for file /Users/shiranrubin/go/src/github.com/shiranr/linkcheck/README.md"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 11 link nla.go status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 9 link main.go status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 20 link nla.go status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 18 link main.go status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 17 link https://www.microsoft.com/developerblog/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 8 link https://www.microsoft.com/developerblog/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 24 link http://bla.com status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 15 link http://bla.com status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 4 link http://bla.com status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 2 link https://test.com status 0"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 22 link https://test.com status 0"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 13 link https://test.com status 0"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="****************************"
+time="2022-12-19T09:16:17+02:00" level=info msg="Results for file /Users/shiranrubin/go/src/github.com/shiranr/linkcheck/tests/resources/another_markdown.md"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 73 link https://learn.microsoft.com/en-us/azure/architecture/framework/scalability/load-testing status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 4 link https://en.wikipedia.org/wiki/Load_testing status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 58 link https://gatling.io/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 61 link https://nbomber.com/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 59 link https://locust.io/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 56 link https://github.com/apache/jmeter status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 60 link https://k6.io/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Line 57 link https://artillery.io/ status 200"
+time="2022-12-19T09:16:17+02:00" level=info
+time="2022-12-19T09:16:17+02:00" level=info msg="Time elapsed: 2m50.464899032s"
