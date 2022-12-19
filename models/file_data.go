@@ -1,7 +1,6 @@
 package models
 
 import (
-	"bufio"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"path"
@@ -12,13 +11,6 @@ type FileData struct {
 	fileName   string
 	folderPath string
 	file       *os.File
-	Scanner
-}
-
-type Scanner struct {
-	scanner    *bufio.Scanner
-	lineNumber int
-	canRead    bool
 }
 
 func (fileData *FileData) FileName() string {
@@ -52,9 +44,6 @@ func NewFileData(path string) (*FileData, error) {
 	} else {
 		fileData.folderPath, _ = filepath.Split(path)
 		fileData.fileName = filepath.Base(path)
-		fileData.file, _ = os.Open(path)
-		fileData.scanner = bufio.NewScanner(fileData.File())
-		fileData.lineNumber = 1
 	}
 	return fileData, nil
 
@@ -62,13 +51,4 @@ func NewFileData(path string) (*FileData, error) {
 
 func (fileData *FileData) Close() {
 	defer fileData.file.Close()
-}
-
-func (fileData *FileData) ScanOneLine() (string, int) {
-	if fileData.scanner.Scan() {
-		lineText := fileData.scanner.Text()
-		fileData.lineNumber++
-		return lineText, fileData.lineNumber
-	}
-	return "", -1
 }

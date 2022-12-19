@@ -40,19 +40,18 @@ func GetURLHandlerInstance() *urlHandler {
 	return handler
 }
 
-func (handler *urlHandler) Handle(linkData *Link) {
-	linkData.LinkType = URL
-	respStatus, err := handler.httpRequest(linkData.Path)
+func (handler *urlHandler) Handle(linkPath string) int {
+	respStatus, err := handler.httpRequest(linkPath)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"link":  linkData.Path,
+			"link":  linkPath,
 			"error": err,
 		}).Error("Failed get URL data")
 		if strings.Contains(err.Error(), "timeout") {
-			linkData.Status = 504
+			return 504
 		}
 	}
-	linkData.Status = respStatus
+	return respStatus
 }
 
 func (handler *urlHandler) httpRequest(link string) (int, error) {

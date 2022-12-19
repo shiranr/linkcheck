@@ -20,12 +20,10 @@ func GetEmailHandlerInstance() *emailHandler {
 	return mailHandler
 }
 
-func (handler *emailHandler) Handle(linkData *Link) {
-	linkData.LinkType = Email
-	email := strings.Split(linkData.Path, ":")[0]
+func (handler *emailHandler) Handle(linkPath string) int {
+	email := strings.Split(linkPath, ":")[0]
 	if !emailRegex.MatchString(email) {
-		linkData.Status = 400
-		return
+		return 400
 	}
-	linkData.Status = 200
+	return 200
 }

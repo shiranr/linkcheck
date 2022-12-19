@@ -10,50 +10,53 @@ import (
 )
 
 var (
-	fileHandler *fileLinkHandler
+	linkFileHandler *fileLinkHandler
 )
 
 type fileLinkHandler struct {
-	fileData *FileData
+	folderPath string
+	fileName   string
 }
 
-func GetFileLinkHandler(data *FileData) *fileLinkHandler {
-	fileHandler = &fileLinkHandler{
-		fileData: data,
+func GetFileLinkHandler(filePath string) *fileLinkHandler {
+	fileData, err := NewFileData(filePath)
+	if err != nil {
+		return nil
 	}
-	return fileHandler
+	linkFileHandler = &fileLinkHandler{
+		folderPath: fileData.folderPath,
+		fileName:   fileData.fileName,
+	}
+	return linkFileHandler
 }
 
-func (handler *fileLinkHandler) Handle(linkData *Link) {
-	linkData.LinkType = Folder
-	linkedFileEscapedFullPath := handler.escapedFullPath(linkData.Path)
+func (handler *fileLinkHandler) Handle(linkPath string) int {
+	linkedFileEscapedFullPath := handler.escapedFullPath(linkPath)
 	_, err := os.Stat(linkedFileEscapedFullPath)
 	if err != nil {
-		linkData.Status = 400
 		log.WithFields(log.Fields{
-			"link":  linkData.Path,
+			"link":  linkPath,
 			"error": err,
 		}).Error("Failed to get link data")
-		return
+		return 400
 	}
-	if strings.Contains(linkData.Path, "#") {
+	if strings.Contains(linkPath, "#") {
 		fileBytes, _ := os.ReadFile(linkedFileEscapedFullPath)
 		fileData := string(fileBytes)
-		if !handler.fileContainsLink(linkData.Path, fileData) {
-			linkData.Status = 400
-			return
+		if !handler.fileContainsLink(linkPath, fileData) {
+			return 400
 		}
 	}
-	linkData.Status = 200
+	return 200
 }
 
 func (handler *fileLinkHandler) escapedFullPath(extension string) string {
-	folderPath := handler.fileData.folderPath
+	folderPath := handler.folderPath
 	if strings.HasPrefix(extension, "#") {
-		folderPath = path.Join(handler.fileData.folderPath, handler.fileData.fileName)
+		folderPath = path.Join(handler.folderPath, handler.fileName)
 	} else if strings.Contains(extension, "#") {
 		fileName := strings.Split(extension, "#")[0]
-		folderPath = path.Join(handler.fileData.folderPath, fileName)
+		folderPath = path.Join(handler.folderPath, fileName)
 	}
 	folderPath, _ = url.PathUnescape(folderPath)
 	return folderPath

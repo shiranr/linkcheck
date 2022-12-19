@@ -9,16 +9,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 )
-
-var wg sync.WaitGroup
-var lineHandler = models.GetLinkExtractorInstance()
-
-var result = models.Result{
-	FilesLinksMap: map[string]*models.FileLink{},
-}
 
 // TODO add tests.
 // TODO add CMD.
@@ -36,9 +28,7 @@ func main() {
 	multiWriter := io.MultiWriter(logFile, os.Stdout)
 	log.SetOutput(multiWriter)
 	readmeFiles := extractReadmeFiles()
-	extractLinksFromReadmes(readmeFiles)
-	wg.Wait()
-	result.Print()
+	models.GetFilesProcessorInstance().Process(readmeFiles)
 	end := time.Now()
 	log.Info("Time elapsed: " + end.Sub(start).String())
 }
@@ -54,56 +44,6 @@ func loadConfiguration() {
 			"error": err,
 		}).Fatal("Failed to load configuration")
 	}
-}
-
-func extractLinksFromReadmes(files []string) {
-	for _, filePath := range files {
-		wg.Add(1)
-		go handleFile(filePath)
-	}
-}
-
-func handleFile(filePath string) {
-	defer wg.Done()
-	fileLinkData := models.FileLink{
-		FilePath: filePath,
-		Links:    []*models.Link{},
-	}
-	result.AddNewFile(&fileLinkData)
-	fileData, err := models.NewFileData(filePath)
-	if err != nil {
-		return
-	}
-	lineText, lineNumber := fileData.ScanOneLine()
-	for lineNumber != -1 {
-		linksPaths := lineHandler.FindAndGetLinks(lineText)
-		for _, linkPath := range linksPaths {
-			linkData := &models.Link{
-				LineNumber: lineNumber,
-				Status:     0,
-				Path:       linkPath,
-			}
-			wg.Add(1)
-			go checkLink(fileData, linkData)
-		}
-		lineText, lineNumber = fileData.ScanOneLine()
-	}
-}
-
-func checkLink(fileData *models.FileData, linkData *models.Link) {
-	defer wg.Done()
-	switch {
-	case strings.HasPrefix(linkData.Path, "http"):
-		urlHandler := models.GetURLHandlerInstance()
-		urlHandler.Handle(linkData)
-	case strings.HasPrefix(linkData.Path, "mailto:"):
-		emailHandler := models.GetEmailHandlerInstance()
-		emailHandler.Handle(linkData)
-	default:
-		fileLinkHandler := models.GetFileLinkHandler(fileData)
-		fileLinkHandler.Handle(linkData)
-	}
-	result.Append(linkData, fileData.FullFilePath())
 }
 
 func extractReadmeFiles() []string {
