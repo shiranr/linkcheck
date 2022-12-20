@@ -90,7 +90,9 @@ func (handler *linkHandler) ExtractLinks(path string) []string {
 			linkPath = strings.Split(linkPath, "](")[1]
 		}
 		lastIndex := strings.LastIndex(linkPath, ")")
-		linkPath = linkPath[0:lastIndex]
+		if lastIndex > 0 {
+			linkPath = linkPath[0:lastIndex]
+		}
 		if !handler.isExcluded(linkPath) {
 			validPaths = append(validPaths, linkPath)
 		}
