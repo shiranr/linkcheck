@@ -7,8 +7,7 @@ import (
 	"sync"
 )
 
-var link = "\\[.*\\]\\(.*\\)|https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
-var regex, _ = regexp.Compile(link)
+var link = "\\[.*\\]\\([-a-zA-Z0-9@:%_\\+.~#?&=\\s]\\)|https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
 
 type LinkHandler interface {
 	CheckLink(filePath string, linkPath string, lineNumber int) *Link
@@ -43,6 +42,7 @@ var lh *linkHandler
 
 func GetLinkHandlerInstance() LinkHandler {
 	if lh == nil {
+		var regex, _ = regexp.Compile(link)
 		lh = &linkHandler{
 			linksCache{
 				linksCache: map[string]int{},
