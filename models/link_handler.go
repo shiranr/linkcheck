@@ -17,7 +17,8 @@ type LinkHandler interface {
 
 type linkHandler struct {
 	linksCache
-	regex *regexp.Regexp
+	regex         *regexp.Regexp
+	excludedLinks []string
 }
 
 type linksCache struct {
@@ -45,7 +46,7 @@ func GetLinkHandlerInstance() LinkHandler {
 		lh = &linkHandler{
 			linksCache{
 				linksCache: map[string]int{},
-			}, regex,
+			}, regex, viper.GetStringSlice("exclude_links"),
 		}
 	}
 	return lh
@@ -88,7 +89,8 @@ func (handler *linkHandler) ExtractLinks(path string) []string {
 		if strings.Contains(linkPath, "](") {
 			linkPath = strings.Split(linkPath, "](")[1]
 		}
-		linkPath = strings.Split(linkPath, ")")[0]
+		lastIndex := strings.LastIndex(linkPath, ")")
+		linkPath = linkPath[0:lastIndex]
 		if !handler.isExcluded(linkPath) {
 			validPaths = append(validPaths, linkPath)
 		}

@@ -63,7 +63,9 @@ func (res *Result) AddNewFile(fileLink *FileLink) {
 func (res *Result) Read() {
 	for !res.close || len(res.Channel) > 0 {
 		linkResult := <-res.Channel
-		res.Append(linkResult.link, linkResult.filePath)
+		if linkResult != nil {
+			res.Append(linkResult.link, linkResult.filePath)
+		}
 	}
 	res.done = true
 }
