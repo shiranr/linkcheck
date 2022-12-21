@@ -3,7 +3,7 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"io"
 	"linkcheck/models"
 	"os"
@@ -14,40 +14,33 @@ import (
 )
 
 // TODO add tests.
-// TODO add CMD.
 // TODO make this a linter for megalinter.
 // TODO add workflow
+// TODO add config file scanning
 func main() {
 	start := time.Now()
-	var app = cli.NewApp()
-	appInfo(app)
-	setupCLICommands(app)
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	end := time.Now()
-	log.Info("Time elapsed: " + end.Sub(start).String())
-}
-
-func setupCLICommands(app *cli.App) {
-	app.Commands = []cli.Command{{
-		Name:    "check",
-		Aliases: []string{"c"},
-		Usage:   "Go through files and check the links",
-		Action: func(ctx *cli.Context) {
+	var app = &cli.App{
+		Name:    "linkcheck",
+		Usage:   "A linter in Golang to verify Markdown links.",
+		Version: "1.0.0",
+		Action: func(ctx *cli.Context) error {
 			configPath := ctx.Args().Get(0)
 			if configPath == "" {
-				configPath = "configuration/linkcheck.json"
+				_, b, _, _ := runtime.Caller(0)
+				basepath := filepath.Dir(b)
+				configPath = basepath + "/configuration/linkcheck.json"
 			}
 			loadConfiguration(configPath)
 			setUpLogger()
 			readmeFiles := extractReadmeFiles()
-			models.GetFilesProcessorInstance().Process(readmeFiles)
+			return models.GetFilesProcessorInstance().Process(readmeFiles)
 		},
-		OnUsageError: nil,
-		Flags:        nil,
-	}}
+	}
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+	end := time.Now()
+	log.Info("Time elapsed: " + end.Sub(start).String())
 }
 
 func setUpLogger() {
@@ -61,18 +54,8 @@ func setUpLogger() {
 	log.SetOutput(multiWriter)
 }
 
-func appInfo(cli *cli.App) {
-	cli.Name = "GoMDLinkCheck"
-	cli.Usage = "A linter in Golang to verify Markdown links."
-	cli.Author = "Shiran Rubin"
-	cli.Version = "1.0.0"
-}
-
 func loadConfiguration(configPath string) {
-	viper.SetConfigName(configPath)
-	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
-	viper.AddConfigPath(basepath + "/configuration")
+	viper.SetConfigFile(configPath)
 	viper.SetConfigType("json")
 	if err := viper.ReadInConfig(); err != nil {
 		log.WithFields(log.Fields{

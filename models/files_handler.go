@@ -11,7 +11,7 @@ type filesProcessor struct {
 }
 
 type FilesProcessor interface {
-	Process(files []string)
+	Process(files []string) error
 }
 
 func GetFilesProcessorInstance() FilesProcessor {
@@ -23,7 +23,7 @@ func GetFilesProcessorInstance() FilesProcessor {
 	return fp
 }
 
-func (fh *filesProcessor) Process(files []string) {
+func (fh *filesProcessor) Process(files []string) error {
 	for _, filePath := range files {
 		fileLinkData := FileLink{
 			FilePath: filePath,
@@ -39,5 +39,5 @@ func (fh *filesProcessor) Process(files []string) {
 	}
 	wg.Wait()
 	fh.Close()
-	fh.Print()
+	return fh.Print()
 }

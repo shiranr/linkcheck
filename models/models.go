@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"strconv"
@@ -91,10 +92,14 @@ func (res *Result) Append(link *Link, filePath string) {
 	res.FilesLinksMap[filePath].append(link)
 }
 
-func (res *Result) Print() {
+func (res *Result) Print() error {
+	err := false
 	log.Info("Went through " + strconv.Itoa(len(res.FilesLinksMap)) + " files")
 	for key, val := range res.FilesLinksMap {
 		if !res.onlyErrors || res.onlyErrors && val.Error {
+			if val.Error {
+				err = true
+			}
 			log.Info("****************************")
 			log.Info("Results for file " + key)
 			log.Info("")
@@ -106,4 +111,8 @@ func (res *Result) Print() {
 			}
 		}
 	}
+	if err {
+		return errors.New("some links check failed, please check the logs")
+	}
+	return nil
 }
