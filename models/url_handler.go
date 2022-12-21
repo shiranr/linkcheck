@@ -22,14 +22,22 @@ func GetURLHandlerInstance() *urlHandler {
 
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath)
-	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "not found") {
+	for i := 0; i < 2 && err != nil; i++ {
+		errLower := strings.ToLower(err.Error())
+		if strings.Contains(errLower, "eof") {
+			respStatus, err = handler.scrap(linkPath)
+			if err == nil {
+				return respStatus
+			}
+			errLower = strings.ToLower(err.Error())
+		}
+		if strings.Contains(errLower, "not found") {
 			return 404
 		}
-		if strings.Contains(strings.ToLower(err.Error()), "forbidden") {
+		if strings.Contains(errLower, "forbidden") {
 			return 403
 		}
-		if strings.Contains(strings.ToLower(err.Error()), "timeout") {
+		if strings.Contains(errLower, "timeout") {
 			return 504
 		}
 		log.WithFields(log.Fields{
