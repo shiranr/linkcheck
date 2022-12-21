@@ -1,0 +1,6 @@
+{
+  "path": "../../",
+  "exclude_links": [],
+  "output_path": "/Users/shiranrubin/go/src/github.com/shiranr/linkcheck/output/output.txt",
+  "only_errors": false
+}
