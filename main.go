@@ -4,7 +4,6 @@ import (
 	"github.com/shiranr/linkcheck/models"
 	"github.com/shiranr/linkcheck/utils"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
 	"os"
 	"path/filepath"
@@ -39,10 +38,10 @@ func main() {
 			configPath = ctx.String("config")
 			utils.LoadConfiguration(configPath)
 			var readmeFiles []string
-			if viper.GetBool("project_path") {
-				readmeFiles = utils.ExtractReadmeFiles()
-			} else {
+			if ctx.Args().Len() > 0 {
 				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
+			} else {
+				readmeFiles = utils.ExtractReadmeFiles()
 			}
 			return models.GetFilesProcessorInstance().Process(readmeFiles)
 		},
