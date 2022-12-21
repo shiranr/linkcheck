@@ -20,7 +20,11 @@ func LoadConfiguration(configPath string) {
 
 func ExtractReadmeFiles() []string {
 	var readmeFiles []string
-	path, err := os.Getwd()
+	var err error
+	path := viper.GetString("project_path")
+	if path == "" {
+		path, err = os.Getwd()
+	}
 	if err == nil {
 		log.Info("extracting readme files from path " + path)
 		err = filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
