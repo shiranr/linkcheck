@@ -22,6 +22,7 @@ linters:
     cli_lint_errors_regex: "*** ERROR: ([0-9]+) links check failed, please check the logs ***"
     examples:
       - "linkcheck"
+      - "linkcheck README.md"
     install:
       dockerfile:
         - RUN go install github.com/shiranr/linkcheck
