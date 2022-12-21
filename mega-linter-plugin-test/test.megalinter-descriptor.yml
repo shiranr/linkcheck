@@ -1,0 +1,12 @@
+descriptor_id: TEST
+descriptor_type: format
+file_extensions:
+  - .jsonc
+linters:
+  - examples:
+      - jsonlint myfile.jsonc
+    install:
+      dockerfile:
+        - RUN npm install jsonlint -g && echo "This is my test MegaLinter plugin!"
+    linter_name: jsonlint
+    linter_url: https://github.com/zaach/jsonlint
