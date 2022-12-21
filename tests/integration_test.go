@@ -14,7 +14,6 @@ func TestFiles(t *testing.T) {
 	basepath := filepath.Dir(b)
 	configPath := basepath + "/resources/linkcheck.json"
 	utils.LoadConfiguration(configPath)
-	utils.SetUpLogger()
 	readmeFiles := utils.ExtractReadmeFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
 	assert.Equal(t, res.Error(), "")

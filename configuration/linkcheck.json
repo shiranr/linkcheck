@@ -1,6 +1,5 @@
 {
   "path": "./",
   "exclude_links": [],
-  "output_path": "output/output.txt",
   "only_errors": true
 }

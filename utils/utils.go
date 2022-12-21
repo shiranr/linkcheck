@@ -3,21 +3,10 @@ package utils
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-func SetUpLogger(outputPath string) {
-	logFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).
-			Fatal("Failed to open log file.")
-	}
-	multiWriter := io.MultiWriter(logFile, os.Stdout)
-	log.SetOutput(multiWriter)
-}
 
 func LoadConfiguration(configPath string) {
 	viper.SetConfigFile(configPath)
