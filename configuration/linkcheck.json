@@ -1,12 +1,6 @@
 {
   "path": "./",
-  "exclude_links": [
-    "http://127.0.0.1:10000",
-    "http://127.0.0.1:10001",
-    "http://link-to-feature-or-story-work-item",
-    "http://link-to-task-work-item"
-
-  ],
+  "exclude_links": [],
   "output_path": "output/output.txt",
   "only_errors": true
 }

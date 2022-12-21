@@ -3,6 +3,7 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/urfave/cli"
 	"io"
 	"linkcheck/models"
 	"os"
@@ -18,7 +19,38 @@ import (
 // TODO add workflow
 func main() {
 	start := time.Now()
-	loadConfiguration()
+	var app = cli.NewApp()
+	appInfo(app)
+	setupCLICommands(app)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+	end := time.Now()
+	log.Info("Time elapsed: " + end.Sub(start).String())
+}
+
+func setupCLICommands(app *cli.App) {
+	app.Commands = []cli.Command{{
+		Name:    "check",
+		Aliases: []string{"c"},
+		Usage:   "Go through files and check the links",
+		Action: func(ctx *cli.Context) {
+			configPath := ctx.Args().Get(0)
+			if configPath == "" {
+				configPath = "configuration/linkcheck.json"
+			}
+			loadConfiguration(configPath)
+			setUpLogger()
+			readmeFiles := extractReadmeFiles()
+			models.GetFilesProcessorInstance().Process(readmeFiles)
+		},
+		OnUsageError: nil,
+		Flags:        nil,
+	}}
+}
+
+func setUpLogger() {
 	outputPath := viper.GetString("output_path")
 	logFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -27,14 +59,17 @@ func main() {
 	}
 	multiWriter := io.MultiWriter(logFile, os.Stdout)
 	log.SetOutput(multiWriter)
-	readmeFiles := extractReadmeFiles()
-	models.GetFilesProcessorInstance().Process(readmeFiles)
-	end := time.Now()
-	log.Info("Time elapsed: " + end.Sub(start).String())
 }
 
-func loadConfiguration() {
-	viper.SetConfigName("linkcheck.json")
+func appInfo(cli *cli.App) {
+	cli.Name = "GoMDLinkCheck"
+	cli.Usage = "A linter in Golang to verify Markdown links."
+	cli.Author = "Shiran Rubin"
+	cli.Version = "1.0.0"
+}
+
+func loadConfiguration(configPath string) {
+	viper.SetConfigName(configPath)
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	viper.AddConfigPath(basepath + "/configuration")
