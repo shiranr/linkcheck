@@ -36,7 +36,13 @@ func main() {
 			configPath = ctx.String("config")
 			utils.LoadConfiguration(configPath)
 			utils.SetUpLogger()
-			readmeFiles := utils.ExtractReadmeFiles()
+			var readmeFiles []string
+			if ctx.Args().Len() > 0 {
+				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
+			} else {
+				readmeFiles = utils.ExtractReadmeFiles()
+			}
+
 			return models.GetFilesProcessorInstance().Process(readmeFiles)
 		},
 	}

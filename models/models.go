@@ -93,26 +93,27 @@ func (res *Result) Append(link *Link, filePath string) {
 }
 
 func (res *Result) Print() error {
-	err := false
+	errCount := 0
 	log.Info("Went through " + strconv.Itoa(len(res.FilesLinksMap)) + " files")
 	for key, val := range res.FilesLinksMap {
 		if !res.onlyErrors || res.onlyErrors && val.Error {
-			if val.Error {
-				err = true
-			}
 			log.Info("****************************")
 			log.Info("Results for file " + key)
 			log.Info("")
 			for _, link := range val.Links {
 				if !res.onlyErrors || res.onlyErrors && link.Status != 200 {
+					if link.Status != 200 {
+						errCount++
+					}
 					log.Info("Line " + strconv.Itoa(link.LineNumber) + " link " + link.Path + " status " + strconv.Itoa(link.Status))
 					log.Info("")
 				}
 			}
 		}
 	}
-	if err {
-		return errors.New("some links check failed, please check the logs")
+	if errCount > 0 {
+		errMsg := "*** ERROR: " + strconv.Itoa(errCount) + " links check failed, please check the logs ***"
+		return errors.New(errMsg)
 	}
 	return nil
 }

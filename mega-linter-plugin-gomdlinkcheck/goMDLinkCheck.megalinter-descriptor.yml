@@ -10,8 +10,6 @@ install:
 linters:
   # GOMDLinkCheck
   - linter_name: gomdlinkcheck
-    is_formatter: false
-    name: GOMDLinkCheck
     linter_url: https://github.com/shiranr/linkcheck
     linter_repo: https://github.com/shiranr/linkcheck
     config_file_name: linkcheck.json
@@ -19,6 +17,9 @@ linters:
     cli_help_arg_name: "-help"
     cli_version_arg_name: "-version"
     cli_lint_fix_arg_name: "--megalinter-fix-flag" # Workaround for MegaLinter
+    cli_lint_mode: list_of_files
+    cli_lint_errors_count: regex_sum
+    cli_lint_errors_regex: "*** ERROR: ([0-9]+) links check failed, please check the logs ***"
     examples:
       - "linkcheck"
     install:

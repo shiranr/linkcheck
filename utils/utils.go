@@ -54,3 +54,14 @@ func ExtractReadmeFiles() []string {
 	}
 	return readmeFiles
 }
+
+func ExtractReadmeFilesFromList(filesList []string) []string {
+	var readmeFiles []string
+	for _, filePath := range filesList {
+		if strings.HasSuffix(strings.ToLower(filePath), ".md") {
+			filePath, _ = filepath.Abs(filePath)
+			readmeFiles = append(readmeFiles, filePath)
+		}
+	}
+	return readmeFiles
+}
