@@ -40,8 +40,7 @@ func main() {
 			utils.LoadConfiguration(configPath)
 			var readmeFiles []string
 			if viper.GetBool("project_path") {
-				log.Info("Extracting readme file from " + ctx.Args().First())
-				readmeFiles = utils.ExtractReadmeFiles(ctx.Args().First())
+				readmeFiles = utils.ExtractReadmeFiles()
 			} else {
 				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
 			}

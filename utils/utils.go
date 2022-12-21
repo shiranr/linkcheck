@@ -18,19 +18,21 @@ func LoadConfiguration(configPath string) {
 	}
 }
 
-func ExtractReadmeFiles(path string) []string {
+func ExtractReadmeFiles() []string {
 	var readmeFiles []string
-	err := filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
-		if file.IsDir() && strings.Contains(file.Name(), "vendor") {
-			return filepath.SkipDir
-		}
-		if strings.HasSuffix(strings.ToLower(file.Name()), ".md") {
-			path, _ = filepath.Abs(path)
-			readmeFiles = append(readmeFiles, path)
-		}
-		return nil
-	})
-
+	path, err := os.Getwd()
+	if err == nil {
+		err = filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
+			if file.IsDir() && strings.Contains(file.Name(), "vendor") {
+				return filepath.SkipDir
+			}
+			if strings.HasSuffix(strings.ToLower(file.Name()), ".md") {
+				path, _ = filepath.Abs(path)
+				readmeFiles = append(readmeFiles, path)
+			}
+			return nil
+		})
+	}
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
