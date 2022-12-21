@@ -19,17 +19,23 @@ import (
 // TODO add config file scanning
 func main() {
 	start := time.Now()
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	configPath := basepath + "/configuration/linkcheck.json"
 	var app = &cli.App{
-		Name:    "linkcheck",
-		Usage:   "A linter in Golang to verify Markdown links.",
+		Name:  "linkcheck",
+		Usage: "A linter in Golang to verify Markdown links.",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "config",
+				Value:       configPath,
+				Usage:       "configuration file",
+				Destination: &configPath,
+			},
+		},
 		Version: "1.0.0",
 		Action: func(ctx *cli.Context) error {
-			configPath := ctx.Args().Get(0)
-			if configPath == "" {
-				_, b, _, _ := runtime.Caller(0)
-				basepath := filepath.Dir(b)
-				configPath = basepath + "/configuration/linkcheck.json"
-			}
+			configPath = ctx.String("config")
 			loadConfiguration(configPath)
 			setUpLogger()
 			readmeFiles := extractReadmeFiles()
