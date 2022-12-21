@@ -4,10 +4,8 @@ import (
 	"github.com/shiranr/linkcheck/models"
 	"github.com/shiranr/linkcheck/utils"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -17,6 +15,7 @@ import (
 // TODO make this a linter for megalinter.
 // TODO add workflow
 // TODO add config file scanning
+// TODO add logs
 func main() {
 	start := time.Now()
 	_, b, _, _ := runtime.Caller(0)
@@ -37,8 +36,6 @@ func main() {
 		Action: func(ctx *cli.Context) error {
 			configPath = ctx.String("config")
 			utils.LoadConfiguration(configPath)
-			outputPath := path.Join(basepath, viper.GetString("output_path"))
-			utils.SetUpLogger(outputPath)
 			var readmeFiles []string
 			if ctx.Args().Len() > 0 {
 				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
