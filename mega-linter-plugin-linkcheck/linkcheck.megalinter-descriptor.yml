@@ -1,4 +1,4 @@
-descriptor_id: linkcheck
+descriptor_id: LINKCHECK
 descriptor_type: format
 descriptor_flavors:
   - go
@@ -6,7 +6,7 @@ file_extensions:
   - ".md"
 linters:
   # linkcheck
-  - linter_name: linkcheck
+  - linter_name: LINKCHECK
     linter_url: https://github.com/shiranr/linkcheck
     linter_repo: https://github.com/shiranr/linkcheck
     config_file_name: linkcheck.json
@@ -16,7 +16,7 @@ linters:
     cli_lint_fix_arg_name: "--megalinter-fix-flag" # Workaround for MegaLinter
     cli_lint_mode: list_of_files
     cli_lint_errors_count: regex_sum
-    cli_lint_errors_regex: "*** ERROR: ([0-9]+) links check failed, please check the logs ***"
+    cli_lint_errors_regex: "ERROR: ([0-9]+) links check failed, please see logs for more details"
     examples:
       - "linkcheck"
       - "linkcheck README.md"
