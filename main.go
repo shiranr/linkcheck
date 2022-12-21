@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/shiranr/linkcheck/models"
+	"github.com/shiranr/linkcheck/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
-	"linkcheck/models"
-	"linkcheck/utils"
 	"os"
 	"path/filepath"
 	"runtime"
