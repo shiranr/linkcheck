@@ -19,6 +19,7 @@ import (
 // TODO add logs
 func main() {
 	start := time.Now()
+	log.SetLevel(log.InfoLevel)
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	configPath := basepath + "/configuration/linkcheck.json"
