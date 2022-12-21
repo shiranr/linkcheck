@@ -23,13 +23,19 @@ func GetURLHandlerInstance() *urlHandler {
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath)
 	if err != nil {
+		if strings.Contains(strings.ToLower(err.Error()), "not found") {
+			return 404
+		}
+		if strings.Contains(strings.ToLower(err.Error()), "forbidden") {
+			return 403
+		}
+		if strings.Contains(strings.ToLower(err.Error()), "timeout") {
+			return 504
+		}
 		log.WithFields(log.Fields{
 			"link":  linkPath,
 			"error": err,
 		}).Error("Failed get URL data")
-		if strings.Contains(err.Error(), "timeout") {
-			return 504
-		}
 	}
 	return respStatus
 }
