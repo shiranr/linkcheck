@@ -84,6 +84,7 @@ func (res *Result) Append(link *Link, filePath string) {
 }
 
 func (res *Result) Print() {
+	log.Info("Went through " + strconv.Itoa(len(res.FilesLinksMap)) + " links")
 	for key, val := range res.FilesLinksMap {
 		log.Info("****************************")
 		log.Info("Results for file " + key)
