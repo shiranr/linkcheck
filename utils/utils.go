@@ -22,11 +22,13 @@ func ExtractReadmeFiles() []string {
 	var readmeFiles []string
 	path, err := os.Getwd()
 	if err == nil {
+		log.Info("extracting readme files from path " + path)
 		err = filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
 			if file.IsDir() && strings.Contains(file.Name(), "vendor") {
 				return filepath.SkipDir
 			}
 			if strings.HasSuffix(strings.ToLower(file.Name()), ".md") {
+				log.Info("Got readme file " + file.Name())
 				path, _ = filepath.Abs(path)
 				readmeFiles = append(readmeFiles, path)
 			}
@@ -43,6 +45,7 @@ func ExtractReadmeFiles() []string {
 
 func ExtractReadmeFilesFromList(filesList []string) []string {
 	var readmeFiles []string
+	log.Info("extracting readme files from list")
 	for _, filePath := range filesList {
 		if strings.HasSuffix(strings.ToLower(filePath), ".md") {
 			filePath, _ = filepath.Abs(filePath)

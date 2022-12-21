@@ -38,7 +38,8 @@ func main() {
 			configPath = ctx.String("config")
 			utils.LoadConfiguration(configPath)
 			var readmeFiles []string
-			if ctx.Args().Len() > 0 {
+			log.Info("Context first argument " + ctx.Args().First())
+			if ctx.Args().Present() {
 				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
 			} else {
 				readmeFiles = utils.ExtractReadmeFiles()
