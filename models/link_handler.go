@@ -7,16 +7,16 @@ import (
 	"sync"
 )
 
-var link = "\\[.*\\]\\([-a-zA-Z0-9@:%_\\+.~#?&=\\s]\\)|https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
+var link = "\\[{1}([\\s-a-zA-Z0-9@:%._\\\\+~#=\\/\\/])*((\\]\\()){1}([\\s-a-zA-Z0-9@:%._\\\\+~#=\\/\\/]{1,256}(\\(.*\\))?(\\\"(.*)\\\")?)\\){1}"
 
 type LinkHandler interface {
 	CheckLink(filePath string, linkPath string, lineNumber int) *Link
-	ExtractLinks(path string) []string
+	ExtractLinks(fileData string) []*linkPath
 }
 
 type linkHandler struct {
 	linksCache
-	regex         *regexp.Regexp
+	mdLinkRegex   *regexp.Regexp
 	excludedLinks []string
 }
 
@@ -41,12 +41,14 @@ func (cache *linksCache) readLink(linkPath string) (int, bool) {
 var lh *linkHandler
 
 func GetLinkHandlerInstance() LinkHandler {
+	regex, _ := regexp.Compile(link)
 	if lh == nil {
-		var regex, _ = regexp.Compile(link)
 		lh = &linkHandler{
 			linksCache{
 				linksCache: map[string]int{},
-			}, regex, viper.GetStringSlice("exclude_links"),
+			},
+			regex,
+			viper.GetStringSlice("exclude_links"),
 		}
 	}
 	return lh
@@ -81,23 +83,38 @@ func (handler *linkHandler) CheckLink(filePath string, linkPath string, lineNumb
 	return linkData
 }
 
-func (handler *linkHandler) ExtractLinks(path string) []string {
-	var linksPaths []string
-	var validPaths []string
-	linksPaths = append(linksPaths, handler.regex.FindAllString(path, -1)...)
-	for _, linkPath := range linksPaths {
-		if strings.Contains(linkPath, "](") {
-			linkPath = strings.Split(linkPath, "](")[1]
+type linkPath struct {
+	LinkLineNumber int
+	Link           string
+}
+
+func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
+	var readmeLinks []string
+	var validLinks []*linkPath
+	readmeLinks = append(readmeLinks, handler.mdLinkRegex.FindAllString(fileData, -1)...)
+	for _, path := range readmeLinks {
+		path = strings.Split(path, "](")[1]
+		if strings.HasSuffix(path, "))") {
+			path = path[0 : len(path)-1]
 		}
-		lastIndex := strings.LastIndex(linkPath, ")")
-		if lastIndex > 0 {
-			linkPath = linkPath[0:lastIndex]
+		if strings.HasSuffix(path, ")") && !strings.Contains(path, "(") {
+			path = path[0 : len(path)-1]
 		}
-		if !handler.isExcluded(linkPath) {
-			validPaths = append(validPaths, linkPath)
+		if !handler.isExcluded(path) {
+			linkPath := &linkPath{LinkLineNumber: handler.findLineNumber(path, fileData), Link: path}
+			validLinks = append(validLinks, linkPath)
 		}
 	}
-	return validPaths
+	return validLinks
+}
+
+func (handler *linkHandler) findLineNumber(link string, fileData string) int {
+	for index, line := range strings.Split(fileData, "\n") {
+		if strings.Contains(line, link) {
+			return index + 1
+		}
+	}
+	return -1
 }
 
 func (handler *linkHandler) isExcluded(link string) bool {

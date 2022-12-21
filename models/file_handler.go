@@ -1,8 +1,6 @@
 package models
 
 import (
-	"bufio"
-	log "github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -11,31 +9,14 @@ type FileHandler interface {
 }
 
 type fileHandler struct {
-	resultChan chan *LinkResult
-	filePath   string
-	Scanner
-}
-
-type Scanner struct {
-	scanner    *bufio.Scanner
-	lineNumber int
+	resultChan    chan *LinkResult
+	filePath      string
+	fileLinesData map[int]string
 }
 
 func GetNewFileHandler(filePath string, resultChan chan *LinkResult) FileHandler {
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-			"path":  filePath,
-		}).Errorf("Failed to read file.")
-		return nil
-	}
 	return &fileHandler{
-		filePath: filePath,
-		Scanner: Scanner{
-			scanner:    bufio.NewScanner(file),
-			lineNumber: 1,
-		},
+		filePath:   filePath,
 		resultChan: resultChan,
 	}
 }
@@ -43,23 +24,11 @@ func GetNewFileHandler(filePath string, resultChan chan *LinkResult) FileHandler
 func (fh *fileHandler) HandleFile() {
 	defer wg.Done()
 	linkHandler := GetLinkHandlerInstance()
-	lineText, lineNumber := fh.scanOneLine()
-
-	for lineNumber != -1 {
-		linksPaths := linkHandler.ExtractLinks(lineText)
-		for _, linkPath := range linksPaths {
-			linkData := linkHandler.CheckLink(fh.filePath, linkPath, lineNumber)
-			fh.resultChan <- &LinkResult{filePath: fh.filePath, link: linkData}
-		}
-		lineText, lineNumber = fh.scanOneLine()
+	fileBytes, _ := os.ReadFile(fh.filePath)
+	fileData := string(fileBytes)
+	linksPaths := linkHandler.ExtractLinks(fileData)
+	for _, linkData := range linksPaths {
+		linkData := linkHandler.CheckLink(fh.filePath, linkData.Link, linkData.LinkLineNumber)
+		fh.resultChan <- &LinkResult{filePath: fh.filePath, link: linkData}
 	}
-}
-
-func (fh *fileHandler) scanOneLine() (string, int) {
-	if fh.scanner.Scan() {
-		lineText := fh.scanner.Text()
-		fh.lineNumber++
-		return lineText, fh.lineNumber
-	}
-	return "", -1
 }
