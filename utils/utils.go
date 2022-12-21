@@ -18,12 +18,8 @@ func LoadConfiguration(configPath string) {
 	}
 }
 
-func ExtractReadmeFiles() []string {
-	path := viper.GetString("path")
+func ExtractReadmeFiles(path string) []string {
 	var readmeFiles []string
-	if envPath := os.Getenv("PROJECT_PATH"); envPath != "" {
-		path = envPath
-	}
 	err := filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
 		if file.IsDir() && strings.Contains(file.Name(), "vendor") {
 			return filepath.SkipDir

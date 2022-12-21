@@ -1,5 +1,5 @@
 {
-  "path": "../../",
+  "project_path": true,
   "exclude_links": [],
-  "only_errors": false
+  "only_errors": true
 }
