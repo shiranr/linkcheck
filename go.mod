@@ -1,4 +1,4 @@
-module linkcheck
+module github.com/shiranr/linkcheck
 
 go 1.18
 
