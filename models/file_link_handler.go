@@ -57,6 +57,8 @@ func (handler *fileLinkHandler) escapedFullPath(extension string) string {
 	} else if strings.Contains(extension, "#") {
 		fileName := strings.Split(extension, "#")[0]
 		folderPath = path.Join(handler.folderPath, fileName)
+	} else {
+		folderPath = path.Join(handler.folderPath, extension)
 	}
 	folderPath, _ = url.PathUnescape(folderPath)
 	return folderPath
