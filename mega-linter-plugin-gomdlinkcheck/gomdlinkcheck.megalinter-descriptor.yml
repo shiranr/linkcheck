@@ -25,4 +25,4 @@ linters:
       - "linkcheck README.md"
     install:
       dockerfile:
-        - RUN go install github.com/shiranr/linkcheck@latest
+        - RUN go install github.com/shiranr/linkcheck@latest && go clean --cache
