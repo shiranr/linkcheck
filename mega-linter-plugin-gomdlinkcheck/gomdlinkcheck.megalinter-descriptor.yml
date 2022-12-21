@@ -1,12 +1,12 @@
-descriptor_id: GOMDLinkCheck
+descriptor_id: linkcheck
 descriptor_type: format
 descriptor_flavors:
   - go
 file_extensions:
   - ".md"
 linters:
-  # GOMDLinkCheck
-  - linter_name: gomdlinkcheck
+  # linkcheck
+  - linter_name: linkcheck
     linter_url: https://github.com/shiranr/linkcheck
     linter_repo: https://github.com/shiranr/linkcheck
     config_file_name: linkcheck.json
