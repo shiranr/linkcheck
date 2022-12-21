@@ -1,4 +1,4 @@
-descriptor_id: LINKCHECK
+descriptor_id: MDLINKCHECK
 descriptor_type: format
 descriptor_flavors:
   - go
@@ -6,7 +6,7 @@ file_extensions:
   - ".md"
 linters:
   # linkcheck
-  - linter_name: LINKCHECK
+  - linter_name: linkcheck
     linter_url: https://github.com/shiranr/linkcheck
     linter_repo: https://github.com/shiranr/linkcheck
     config_file_name: linkcheck.json
