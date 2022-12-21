@@ -21,6 +21,8 @@ linters:
     cli_lint_extra_args:
       - ""
     cli_lint_fix_arg_name: "--megalinter-fix-flag" # Workaround for MegaLinter
+    examples:
+      - "linkcheck"
     install:
       dockerfile:
         - RUN go install github.com/shiranr/linkcheck
