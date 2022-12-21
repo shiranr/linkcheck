@@ -28,6 +28,7 @@ func (fh *filesProcessor) Process(files []string) {
 		fileLinkData := FileLink{
 			FilePath: filePath,
 			Links:    []*Link{},
+			Error:    false,
 		}
 		fh.AddNewFile(&fileLinkData)
 		fileHandler := GetNewFileHandler(filePath, fh.Channel)

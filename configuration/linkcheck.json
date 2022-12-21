@@ -7,5 +7,6 @@
     "http://link-to-task-work-item"
 
   ],
-  "output_path": "output/output.txt"
+  "output_path": "output/output.txt",
+  "only_errors": true
 }

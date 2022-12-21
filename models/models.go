@@ -2,12 +2,14 @@ package models
 
 import (
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"strconv"
 	"sync"
 )
 
 type FileLink struct {
 	FilePath string
+	Error    bool
 	Links    []*Link
 }
 
@@ -36,6 +38,7 @@ type Result struct {
 	Channel       chan *LinkResult
 	close         bool
 	done          bool
+	onlyErrors    bool
 }
 
 type LinkResult struct {
@@ -49,6 +52,7 @@ func getResult() *Result {
 		Channel:       make(chan *LinkResult),
 		close:         false,
 		done:          false,
+		onlyErrors:    viper.GetBool("only_errors"),
 	}
 	go result.Read()
 	return result
@@ -80,18 +84,26 @@ func (res *Result) Close() {
 func (res *Result) Append(link *Link, filePath string) {
 	res.mapLock.Lock()
 	defer res.mapLock.Unlock()
+	fileData := res.FilesLinksMap[filePath]
+	if link.Status != 200 {
+		fileData.Error = true
+	}
 	res.FilesLinksMap[filePath].append(link)
 }
 
 func (res *Result) Print() {
-	log.Info("Went through " + strconv.Itoa(len(res.FilesLinksMap)) + " links")
+	log.Info("Went through " + strconv.Itoa(len(res.FilesLinksMap)) + " files")
 	for key, val := range res.FilesLinksMap {
-		log.Info("****************************")
-		log.Info("Results for file " + key)
-		log.Info("")
-		for _, link := range val.Links {
-			log.Info("Line " + strconv.Itoa(link.LineNumber) + " link " + link.Path + " status " + strconv.Itoa(link.Status))
+		if !res.onlyErrors || res.onlyErrors && val.Error {
+			log.Info("****************************")
+			log.Info("Results for file " + key)
 			log.Info("")
+			for _, link := range val.Links {
+				if !res.onlyErrors || res.onlyErrors && link.Status != 200 {
+					log.Info("Line " + strconv.Itoa(link.LineNumber) + " link " + link.Path + " status " + strconv.Itoa(link.Status))
+					log.Info("")
+				}
+			}
 		}
 	}
 }
