@@ -1,5 +1,7 @@
 descriptor_id: MDLINKCHECK
 descriptor_type: other
+descriptor_flavors:
+  - all
 file_extensions:
   - ".md"
 lint_all_other_linters_files: true
