@@ -16,5 +16,5 @@ func TestFiles(t *testing.T) {
 	utils.LoadConfiguration(configPath)
 	readmeFiles := utils.ExtractReadmeFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
-	assert.Equal(t, res.Error(), "")
+	assert.NoError(t, res)
 }
