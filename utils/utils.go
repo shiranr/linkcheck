@@ -21,18 +21,21 @@ func LoadConfiguration(configPath string) {
 func ExtractReadmeFiles() []string {
 	var readmeFiles []string
 	var err error
-	path := viper.GetString("project_path")
+	path := "/Users/shiranrubin/work/github.com/microsoft/code-with-engineering-playbook/docs" //viper.GetString("project_path")
 	if path == "" {
 		path, err = os.Getwd()
 	}
 	if err == nil {
 		log.Info("extracting readme files from path " + path)
 		err = filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
+			if err != nil {
+				log.WithFields(log.Fields{"error": err}).Error("Failed to walk over path: " + path)
+				return err
+			}
 			if file.IsDir() && strings.Contains(file.Name(), "vendor") {
 				return filepath.SkipDir
 			}
 			if strings.HasSuffix(strings.ToLower(file.Name()), ".md") {
-				log.Info("Got readme file " + file.Name())
 				path, _ = filepath.Abs(path)
 				readmeFiles = append(readmeFiles, path)
 			}
