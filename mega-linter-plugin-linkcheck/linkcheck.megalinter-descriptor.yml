@@ -1,7 +1,9 @@
 descriptor_id: MDLINKCHECK
-descriptor_type: format
+descriptor_type: other
 descriptor_flavors:
   - documentation
+  - all_flavors
+  - all
 file_extensions:
   - ".md"
 lint_all_other_linters_files: true
@@ -22,6 +24,7 @@ linters:
     examples:
       - "linkcheck"
       - "linkcheck README.md"
+      - "linkcheck --config linkcheck.json README.md"
     install:
       dockerfile:
         - RUN go install github.com/shiranr/linkcheck@latest && go clean --cache
