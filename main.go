@@ -12,10 +12,9 @@ import (
 )
 
 // TODO add tests.
-// TODO make this a linter for megalinter.
 // TODO add workflow
-// TODO add config file scanning
-// TODO add logs
+// TODO add support for link description [](link "")
+// TODO fix readme
 func main() {
 	start := time.Now()
 	log.SetLevel(log.InfoLevel)
