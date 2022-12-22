@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"regexp"
 	"strings"
@@ -102,6 +103,7 @@ func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
 		}
 		if !handler.isExcluded(path) {
 			linkPath := &linkPath{LinkLineNumber: handler.findLineNumber(path, fileData), Link: path}
+			log.Info("Appending valid link: " + path)
 			validLinks = append(validLinks, linkPath)
 		}
 	}

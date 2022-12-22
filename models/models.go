@@ -24,6 +24,7 @@ const (
 	URL    LinkType = "URL"
 	Email           = "Email"
 	Folder          = "Folder"
+	File            = "File"
 )
 
 type Link struct {
