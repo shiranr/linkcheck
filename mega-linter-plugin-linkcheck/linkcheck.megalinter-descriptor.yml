@@ -15,6 +15,7 @@ linters:
     cli_version_arg_name: "-version"
     cli_lint_fix_arg_name: "--megalinter-fix-flag" # Workaround for MegaLinter
     cli_lint_mode: project
+    lint_all_files: true
     cli_lint_errors_count: regex_sum
     cli_lint_errors_regex: "ERROR: ([0-9]+) links check failed, please see logs for more details"
     examples:
