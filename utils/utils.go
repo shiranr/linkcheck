@@ -21,7 +21,7 @@ func LoadConfiguration(configPath string) {
 func ExtractReadmeFiles() []string {
 	var readmeFiles []string
 	var err error
-	path := "/Users/shiranrubin/work/github.com/microsoft/code-with-engineering-playbook/docs" //viper.GetString("project_path")
+	path := viper.GetString("project_path")
 	if path == "" {
 		path, err = os.Getwd()
 	}
