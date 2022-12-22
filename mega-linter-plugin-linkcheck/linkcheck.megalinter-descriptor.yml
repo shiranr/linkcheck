@@ -1,9 +1,10 @@
 descriptor_id: MDLINKCHECK
 descriptor_type: format
 descriptor_flavors:
-  - go
+  - documentation
 file_extensions:
   - ".md"
+lint_all_other_linters_files: true
 linters:
   # linkcheck
   - linter_name: linkcheck
