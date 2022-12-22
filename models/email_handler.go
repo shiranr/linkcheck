@@ -21,7 +21,7 @@ func GetEmailHandlerInstance() *emailHandler {
 }
 
 func (handler *emailHandler) Handle(linkPath string) int {
-	email := strings.Split(linkPath, ":")[0]
+	email := strings.Split(linkPath, ":")[1]
 	if !emailRegex.MatchString(email) {
 		return 400
 	}
