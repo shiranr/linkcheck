@@ -32,6 +32,9 @@ func GetFileLinkHandler(filePath string) *fileLinkHandler {
 
 func (handler *fileLinkHandler) Handle(linkPath string) int {
 	linkedFileEscapedFullPath := handler.escapedFullPath(linkPath)
+	if strings.Contains(linkedFileEscapedFullPath, "?") {
+		linkedFileEscapedFullPath = strings.Split(linkedFileEscapedFullPath, "?")[0]
+	}
 	_, err := os.Stat(linkedFileEscapedFullPath)
 	if err != nil {
 		log.WithFields(log.Fields{
