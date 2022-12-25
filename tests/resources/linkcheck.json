@@ -1,4 +1,7 @@
 {
-  "exclude_links": [],
-  "only_errors": true
+  "exclude_links": [
+    "https://test.com",
+    "http://bla.com/"
+  ],
+  "only_errors": false
 }

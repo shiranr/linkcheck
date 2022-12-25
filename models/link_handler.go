@@ -7,7 +7,9 @@ import (
 	"sync"
 )
 
-var link = "\\[{1}([\\s-a-zA-Z0-9@:%._\\\\+~#=\\/\\/])*((\\]\\()){1}([\\s-a-zA-Z0-9@:%._\\\\+~#=\\/\\/]{1,256}(\\(.*\\))?(\\\"(.*)\\\")?)\\){1}"
+var link = "\\[{1}([>\\-\\sa-zA-Z0-9@:%._\\\\+~#=,\\n\\/\\(\\)])*((\\]\\()){1}([\\sa-zA-Z0-9@:%._\\\\+~#=\\/\\/\\-]{1,256}(\\(.*\\))?(\\\"(.*)\\\")?)\\){1}"
+
+var urlRegex = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
 
 type LinkHandler interface {
 	CheckLink(filePath string, linkPath string, lineNumber int) *Link
@@ -41,7 +43,8 @@ func (cache *linksCache) readLink(linkPath string) (int, bool) {
 var lh *linkHandler
 
 func GetLinkHandlerInstance() LinkHandler {
-	regex, _ := regexp.Compile(link)
+	linkOrPath := link + "|" + urlRegex
+	regex, _ := regexp.Compile(linkOrPath)
 	if lh == nil {
 		lh = &linkHandler{
 			linksCache{
@@ -93,15 +96,17 @@ func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
 	var validLinks []*linkPath
 	readmeLinks = append(readmeLinks, handler.mdLinkRegex.FindAllString(fileData, -1)...)
 	for _, path := range readmeLinks {
-		path = strings.Split(path, "](")[1]
-		if strings.HasSuffix(path, "))") {
-			path = path[0 : len(path)-1]
+		if strings.Contains(path, "](") {
+			path = strings.Split(path, "](")[1]
+			if strings.HasSuffix(path, "))") {
+				path = path[0 : len(path)-1]
+			}
+			if strings.HasSuffix(path, ")") && !strings.Contains(path, "(") {
+				path = path[0 : len(path)-1]
+			}
+			path = strings.Split(path, "\\'")[0]
+			path = strings.Split(path, "\"")[0]
 		}
-		if strings.HasSuffix(path, ")") && !strings.Contains(path, "(") {
-			path = path[0 : len(path)-1]
-		}
-		path = strings.Split(path, "\\'")[0]
-		path = strings.Split(path, "\"")[0]
 		if !handler.isExcluded(path) {
 			linkPath := &linkPath{LinkLineNumber: handler.findLineNumber(path, fileData), Link: path}
 			validLinks = append(validLinks, linkPath)
