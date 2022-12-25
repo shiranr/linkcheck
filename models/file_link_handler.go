@@ -70,7 +70,7 @@ func (handler *fileLinkHandler) fileContainsLink(titleLink string, fileText stri
 	title = strings.ReplaceAll(title, "(", "\\(")
 	title = strings.ReplaceAll(title, ")", "\\)")
 	title = "(?i)" + title
-	title = strings.ReplaceAll(title, "-", "( |-|)(?i)")
+	title = strings.ReplaceAll(title, "-", "( |-||: )(?i)")
 	readmeTitleRegex := "#(.*)(?i)" + title
 	linkRegex, err := regexp.Compile(readmeTitleRegex)
 	if err != nil {
