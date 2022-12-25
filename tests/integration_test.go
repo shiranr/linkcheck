@@ -9,12 +9,13 @@ import (
 	"testing"
 )
 
-func TestFiles(t *testing.T) {
+func TestFilesWithError(t *testing.T) {
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	configPath := basepath + "/resources/linkcheck.json"
 	utils.LoadConfiguration(configPath)
 	readmeFiles := utils.ExtractReadmeFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
-	assert.NoError(t, res)
+	assert.ErrorContains(t, res, "ERROR: 3 links check failed, please check the logs")
+
 }

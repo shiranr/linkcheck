@@ -1,3 +1,4 @@
+[Test](markdown.md#energy-proportionality)
 [secure@microsoft.com](mailto:secure@microsoft.com)
 If you are using FxCop analyzers and StyleCop analyzer, it's very simple to enable those in the CI. You have to make sure you are setting up the project using nuget and .editorconfig ([see Project setup](#project-setup)). Once you have this setup, you will have to configure the pipeline to build your code. That's pretty much it. The FxCop analyzers will run and report the result in your build pipeline. If there are rules that are violated, your build will be red.
 - [INVEST](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) in good User Stories and Acceptance Criteria
@@ -15,7 +16,7 @@ http://bla.com
 Parallel link check
 
 If you like variety, coding in many languages, using any available tech across our industry, digging in with our customers, hack fests, occasional travel, and telling the story of what you’ve done in [blog posts](https://www.microsoft.com/developerblog/) and at conferences, then come talk to us.
-[blog posts](main.go)
+[blog posts](linkcheck.json)
 
 [none existing](nla.go)
 
@@ -23,14 +24,6 @@ https://test.com
 
 http://bla.com
 
-If you like variety, coding in many languages, using any available tech across our industry, digging in with our customers, hack fests, occasional travel, and telling the story of what you’ve done in [blog posts](https://www.microsoft.com/developerblog/) and at conferences, then come talk to us.
-[blog posts](main.go)
-
-[none existing](nla.go)
-
-https://test.com
-
-http://bla.com
 
 - [INVEST](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) in good User Stories and Acceptance Criteria
 
@@ -58,3 +51,6 @@ Additionally, the results of a load test can also be used as data to help with c
 - **NBomber** (<https://nbomber.com/>) - Write your test scenarios in C# or F#, available integration with test runners (NUnit/xUnit).
 
 - [Microsoft Azure Well-Architected Framework > Load Testing](https://learn.microsoft.com/en-us/azure/architecture/framework/scalability/load-testing)
+
+
+

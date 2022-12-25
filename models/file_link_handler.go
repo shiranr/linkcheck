@@ -67,8 +67,8 @@ func (handler *fileLinkHandler) escapedFullPath(extension string) string {
 func (handler *fileLinkHandler) fileContainsLink(titleLink string, fileText string) bool {
 	titleLink = strings.Split(titleLink, "#")[1]
 	title := strings.ReplaceAll(titleLink, "#", "")
-	title = strings.ReplaceAll(title, "-", "( |-|)")
-	readmeTitleRegex := "(?i)#( ?)" + title
+	title = strings.ReplaceAll(title, "-", "( |-|)(?i)")
+	readmeTitleRegex := "#(.*)(?i)" + title
 	linkRegex, _ := regexp.Compile(readmeTitleRegex)
 	if len(linkRegex.FindStringSubmatch(fileText)) > 0 {
 		return true
