@@ -1,8 +1,8 @@
 # link-check
 
 This linter is a golang markdown link verifier.
-Originally created and currently running on the (CSE
-playbook)[https://github.com/microsoft/code-with-engineering-playbook].
+Originally created and currently running on the [CSE
+playbook](https://github.com/microsoft/code-with-engineering-playbook).
 
 Contains Megalinter descriptor.
 
