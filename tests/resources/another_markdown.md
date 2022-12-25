@@ -1,4 +1,4 @@
-[Test](markdown.md#energy-proportionality)
+[Test](MARKDOWN.md#energy-proportionality)
 [secure@microsoft.com](mailto:secure@microsoft.com)
 If you are using FxCop analyzers and StyleCop analyzer, it's very simple to enable those in the CI. You have to make sure you are setting up the project using nuget and .editorconfig ([see Project setup](#project-setup)). Once you have this setup, you will have to configure the pipeline to build your code. That's pretty much it. The FxCop analyzers will run and report the result in your build pipeline. If there are rules that are violated, your build will be red.
 - [INVEST](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) in good User Stories and Acceptance Criteria
