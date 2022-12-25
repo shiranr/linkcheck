@@ -69,7 +69,11 @@ func (handler *fileLinkHandler) fileContainsLink(titleLink string, fileText stri
 	title := strings.ReplaceAll(titleLink, "#", "")
 	title = strings.ReplaceAll(title, "-", "( |-|)(?i)")
 	readmeTitleRegex := "#(.*)(?i)" + title
-	linkRegex, _ := regexp.Compile(readmeTitleRegex)
+	linkRegex, err := regexp.Compile(readmeTitleRegex)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err, "title_link": titleLink}).Error("Failed to create file link regex")
+		return false
+	}
 	if len(linkRegex.FindStringSubmatch(fileText)) > 0 {
 		return true
 	}
