@@ -104,8 +104,8 @@ func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
 			if strings.HasSuffix(path, ")") && !strings.Contains(path, "(") {
 				path = path[0 : len(path)-1]
 			}
-			path = strings.Split(path, "\\'")[0]
-			path = strings.Split(path, "\"")[0]
+			path = strings.Split(path, " \\'")[0]
+			path = strings.Split(path, " \"")[0]
 		}
 		if !handler.isExcluded(path) {
 			linkPath := &linkPath{LinkLineNumber: handler.findLineNumber(path, fileData), Link: path}
