@@ -1,4 +1,5 @@
 {
   "exclude_links": [],
-  "only_errors": true
+  "only_errors": true,
+  "serial": false
 }
