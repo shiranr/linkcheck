@@ -8,7 +8,6 @@ linters:
     - dupl
     - errcheck
     - errchkjson
-    - ginkgolinter
     - gofmt
     - goimports
     - golint
