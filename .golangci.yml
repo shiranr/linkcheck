@@ -10,10 +10,9 @@ linters:
     - errchkjson
     - gofmt
     - goimports
-    - golint
+    - revive
     - misspell
     - unused
-    - varcheck
   # Enable presets.
   # https://golangci-lint.run/usage/linters
   presets:
