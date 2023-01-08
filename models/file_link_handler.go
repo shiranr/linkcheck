@@ -5,33 +5,29 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 var (
-	linkFileHandler *fileLinkHandler
+	internalLink *internalLinkHandler
 )
 
-type fileLinkHandler struct {
-	folderPath string
-	fileName   string
+type internalLinkHandler struct {
+	filePath string
 }
 
-func GetFileLinkHandler(filePath string) *fileLinkHandler {
-	fileData, err := NewFileData(filePath)
-	if err != nil {
-		return nil
+func GetInternalLinkHandler(filePath string) LinkHandlerInterface {
+	internalLink = &internalLinkHandler{
+		filePath: filePath,
 	}
-	linkFileHandler = &fileLinkHandler{
-		folderPath: fileData.folderPath,
-		fileName:   fileData.fileName,
-	}
-	return linkFileHandler
+	return internalLink
 }
 
-func (handler *fileLinkHandler) Handle(linkPath string) int {
-	linkedFileEscapedFullPath := handler.escapedFullPath(linkPath)
+func (handler *internalLinkHandler) Handle(linkPath string) int {
+	folderPath, fileName := filepath.Split(handler.filePath)
+	linkedFileEscapedFullPath := handler.escapedFullPath(folderPath, fileName, linkPath)
 	if strings.Contains(linkedFileEscapedFullPath, "?") {
 		linkedFileEscapedFullPath = strings.Split(linkedFileEscapedFullPath, "?")[0]
 	}
@@ -53,21 +49,20 @@ func (handler *fileLinkHandler) Handle(linkPath string) int {
 	return 200
 }
 
-func (handler *fileLinkHandler) escapedFullPath(extension string) string {
-	folderPath := handler.folderPath
-	if strings.HasPrefix(extension, "#") {
-		folderPath = path.Join(handler.folderPath, handler.fileName)
-	} else if strings.Contains(extension, "#") {
-		fileName := strings.Split(extension, "#")[0]
-		folderPath = path.Join(handler.folderPath, fileName)
+func (handler *internalLinkHandler) escapedFullPath(folderPath, fileName, linkPath string) string {
+	if strings.HasPrefix(linkPath, "#") {
+		folderPath = path.Join(folderPath, fileName)
+	} else if strings.Contains(linkPath, "#") {
+		fileName := strings.Split(linkPath, "#")[0]
+		folderPath = path.Join(folderPath, fileName)
 	} else {
-		folderPath = path.Join(handler.folderPath, extension)
+		folderPath = path.Join(folderPath, linkPath)
 	}
 	folderPath, _ = url.PathUnescape(folderPath)
 	return folderPath
 }
 
-func (handler *fileLinkHandler) fileContainsLink(titleLink string, fileText string) bool {
+func (handler *internalLinkHandler) fileContainsLink(titleLink string, fileText string) bool {
 	titleLink = strings.Split(titleLink, "#")[1]
 	title := strings.ReplaceAll(titleLink, "#", "")
 	title = strings.ReplaceAll(title, "(", "\\(")

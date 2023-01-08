@@ -13,7 +13,7 @@ var (
 type urlHandler struct {
 }
 
-func GetURLHandlerInstance() *urlHandler {
+func GetURLHandlerInstance() LinkHandlerInterface {
 	if handler == nil {
 		handler = &urlHandler{}
 	}

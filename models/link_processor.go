@@ -11,12 +11,12 @@ var link = "\\[{1}([é’*&\"|`?'>\\-\\sa-zA-Z0-9@:%._\\\\+~#=,\\n\\/\\(\\)])*((
 
 var urlRegex = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
 
-type LinkHandler interface {
-	CheckLink(filePath string, linkPath string, lineNumber int) *Link
+type LinkProcessor interface {
+	CheckLink(filePath string, linkPath string, lineNumber int) *LinkResult
 	ExtractLinks(fileData string) []*linkPath
 }
 
-type linkHandler struct {
+type linkProcessor struct {
 	linksCache
 	mdLinkRegex   *regexp.Regexp
 	excludedLinks []string
@@ -33,20 +33,20 @@ func (cache *linksCache) addLink(linkPath string, status int) {
 	cache.linksCache[linkPath] = status
 }
 
-func (cache *linksCache) readLink(linkPath string) (int, bool) {
+func (cache *linksCache) checkLinkCache(linkPath string) (int, bool) {
 	cache.mapLock.RLock()
 	defer cache.mapLock.RUnlock()
 	val, ok := cache.linksCache[linkPath]
 	return val, ok
 }
 
-var lh *linkHandler
+var lh *linkProcessor
 
-func GetLinkHandlerInstance() LinkHandler {
+func GetLinkProcessorInstance() LinkProcessor {
 	linkOrPath := link + "|" + urlRegex
 	regex, _ := regexp.Compile(linkOrPath)
 	if lh == nil {
-		lh = &linkHandler{
+		lh = &linkProcessor{
 			linksCache{
 				linksCache: map[string]int{},
 			},
@@ -57,31 +57,32 @@ func GetLinkHandlerInstance() LinkHandler {
 	return lh
 }
 
-func (handler *linkHandler) CheckLink(filePath string, linkPath string, lineNumber int) *Link {
-	linkData := &Link{
-		LineNumber: lineNumber,
-		Status:     0,
-		Path:       linkPath,
+func (processor *linkProcessor) CheckLink(filePath string, linkPath string, lineNumber int) *LinkResult {
+	linkData := &LinkResult{
+		lineNumber: lineNumber,
+		status:     0,
+		path:       linkPath,
+		filePath:   filePath,
 	}
-	status, ok := handler.readLink(linkPath)
+	status, ok := processor.checkLinkCache(linkPath)
 	if !ok {
 		switch {
-		case strings.HasPrefix(linkData.Path, "http"):
-			linkData.LinkType = URL
+		case strings.HasPrefix(linkData.path, "http"):
+			linkData.linkType = URL
 			urlHandler := GetURLHandlerInstance()
-			linkData.Status = urlHandler.Handle(linkPath)
-		case strings.HasPrefix(linkData.Path, "mailto:"):
-			linkData.LinkType = Email
+			linkData.status = urlHandler.Handle(linkPath)
+		case strings.HasPrefix(linkData.path, "mailto:"):
+			linkData.linkType = Email
 			emailHandler := GetEmailHandlerInstance()
-			linkData.Status = emailHandler.Handle(linkPath)
+			linkData.status = emailHandler.Handle(linkPath)
 		default:
-			linkData.LinkType = Folder
-			fileLinkHandler := GetFileLinkHandler(filePath)
-			linkData.Status = fileLinkHandler.Handle(linkPath)
+			linkData.linkType = InternalLink
+			fileLinkHandler := GetInternalLinkHandler(filePath)
+			linkData.status = fileLinkHandler.Handle(linkPath)
 		}
-		handler.addLink(linkPath, linkData.Status)
+		processor.addLink(linkPath, linkData.status)
 	} else {
-		linkData.Status = status
+		linkData.status = status
 	}
 	return linkData
 }
@@ -91,10 +92,10 @@ type linkPath struct {
 	Link           string
 }
 
-func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
+func (processor *linkProcessor) ExtractLinks(fileData string) []*linkPath {
 	var readmeLinks []string
 	var validLinks []*linkPath
-	readmeLinks = append(readmeLinks, handler.mdLinkRegex.FindAllString(fileData, -1)...)
+	readmeLinks = append(readmeLinks, processor.mdLinkRegex.FindAllString(fileData, -1)...)
 	for _, path := range readmeLinks {
 		if strings.Contains(path, "](") {
 			path = strings.Split(path, "](")[1]
@@ -107,15 +108,15 @@ func (handler *linkHandler) ExtractLinks(fileData string) []*linkPath {
 			path = strings.Split(path, " \\'")[0]
 			path = strings.Split(path, " \"")[0]
 		}
-		if !handler.isExcluded(path) {
-			linkPath := &linkPath{LinkLineNumber: handler.findLineNumber(path, fileData), Link: path}
+		if !processor.isExcluded(path) {
+			linkPath := &linkPath{LinkLineNumber: processor.findLineNumber(path, fileData), Link: path}
 			validLinks = append(validLinks, linkPath)
 		}
 	}
 	return validLinks
 }
 
-func (handler *linkHandler) findLineNumber(link string, fileData string) int {
+func (processor *linkProcessor) findLineNumber(link string, fileData string) int {
 	for index, line := range strings.Split(fileData, "\n") {
 		if strings.Contains(line, link) {
 			return index + 1
@@ -124,7 +125,7 @@ func (handler *linkHandler) findLineNumber(link string, fileData string) int {
 	return -1
 }
 
-func (handler *linkHandler) isExcluded(link string) bool {
+func (processor *linkProcessor) isExcluded(link string) bool {
 	for _, excludedPath := range viper.GetStringSlice("exclude_links") {
 		if strings.HasPrefix(link, excludedPath) {
 			return true

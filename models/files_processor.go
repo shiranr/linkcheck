@@ -30,16 +30,16 @@ func GetFilesProcessorInstance() FilesProcessor {
 
 func (fh *filesProcessor) Process(files []string) error {
 	for _, filePath := range files {
-		fileLinkData := FileLink{
+		fileLinkData := FileResultData{
 			FilePath: filePath,
-			Links:    []*Link{},
+			Links:    []*LinkResult{},
 			Error:    false,
 		}
 		fh.AddNewFile(&fileLinkData)
-		fileHandler := GetNewFileHandler(filePath, fh.Channel)
-		if fileHandler != nil {
+		fileProcessor := GetNewFileProcessor(filePath, fh.Channel)
+		if fileProcessor != nil {
 			wg.Add(1)
-			fh.invoke(fileHandler)
+			fh.invoke(fileProcessor)
 		}
 	}
 	wg.Wait()
@@ -47,10 +47,10 @@ func (fh *filesProcessor) Process(files []string) error {
 	return fh.Print()
 }
 
-func (fh *filesProcessor) invoke(fileHandler FileHandler) {
+func (fh *filesProcessor) invoke(fileProcessor FileProcessor) {
 	if fh.serial {
-		fileHandler.HandleFile()
+		fileProcessor.ProcessFile()
 	} else {
-		go fileHandler.HandleFile()
+		go fileProcessor.ProcessFile()
 	}
 }
