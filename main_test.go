@@ -14,7 +14,7 @@ func TestLoadConfiguration(t *testing.T) {
 
 func TestHandlerFile(t *testing.T) {
 	utils.LoadConfiguration("configuration/linkcheck.json")
-	files := utils.ExtractReadmeFiles()
+	files := utils.ExtractMarkdownFiles()
 	assert.Len(t, files, 2)
 	assert.Contains(t, files[0], "/shiranr/linkcheck/README.md")
 	assert.Contains(t, files[1], "/shiranr/linkcheck/tests/resources/another_markdown.md")

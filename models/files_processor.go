@@ -14,10 +14,12 @@ type filesProcessor struct {
 	serial bool
 }
 
+// FilesProcessor - process multiple files either parallel or one by one
 type FilesProcessor interface {
 	Process(files []string) error
 }
 
+// GetFilesProcessorInstance - get instance of files processor (Singleton)
 func GetFilesProcessorInstance() FilesProcessor {
 	if fp == nil {
 		fp = &filesProcessor{
@@ -28,18 +30,19 @@ func GetFilesProcessorInstance() FilesProcessor {
 	return fp
 }
 
+// Process - process the multiple files list
 func (fh *filesProcessor) Process(files []string) error {
 	for _, filePath := range files {
-		fileLinkData := FileLink{
+		fileLinkData := FileResultData{
 			FilePath: filePath,
-			Links:    []*Link{},
+			Links:    []*LinkResult{},
 			Error:    false,
 		}
 		fh.AddNewFile(&fileLinkData)
-		fileHandler := GetNewFileHandler(filePath, fh.Channel)
-		if fileHandler != nil {
+		fileProcessor := GetNewFileProcessor(filePath, fh.Channel)
+		if fileProcessor != nil {
 			wg.Add(1)
-			fh.invoke(fileHandler)
+			fh.invoke(fileProcessor)
 		}
 	}
 	wg.Wait()
@@ -47,10 +50,10 @@ func (fh *filesProcessor) Process(files []string) error {
 	return fh.Print()
 }
 
-func (fh *filesProcessor) invoke(fileHandler FileHandler) {
+func (fh *filesProcessor) invoke(fileProcessor FileProcessor) {
 	if fh.serial {
-		fileHandler.HandleFile()
+		fileProcessor.ProcessFile()
 	} else {
-		go fileHandler.HandleFile()
+		go fileProcessor.ProcessFile()
 	}
 }

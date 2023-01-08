@@ -13,7 +13,8 @@ var (
 type emailHandler struct {
 }
 
-func GetEmailHandlerInstance() *emailHandler {
+// GetEmailHandlerInstance Get email handler instance
+func GetEmailHandlerInstance() LinkHandlerInterface {
 	if mailHandler == nil {
 		mailHandler = &emailHandler{}
 	}

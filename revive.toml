@@ -1,0 +1,3 @@
+# Sets the severity of the `package-comments` rule to "error".
+[rule.package-comments]
+  Disabled = true
