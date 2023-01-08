@@ -39,9 +39,9 @@ func main() {
 			var readmeFiles []string
 			log.Info("Context first argument " + ctx.Args().First())
 			if ctx.Args().Present() {
-				readmeFiles = utils.ExtractReadmeFilesFromList(ctx.Args().Slice())
+				readmeFiles = utils.ExtractMarkdownFilesFromList(ctx.Args().Slice())
 			} else {
-				readmeFiles = utils.ExtractReadmeFiles()
+				readmeFiles = utils.ExtractMarkdownFiles()
 			}
 			return models.GetFilesProcessorInstance().Process(readmeFiles)
 		},

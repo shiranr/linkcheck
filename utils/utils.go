@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// LoadConfiguration - load configuration file from config path
 func LoadConfiguration(configPath string) {
 	viper.SetConfigFile(configPath)
 	viper.SetConfigType("json")
@@ -18,15 +19,17 @@ func LoadConfiguration(configPath string) {
 	}
 }
 
-func ExtractReadmeFiles() []string {
-	var readmeFiles []string
+// ExtractMarkdownFiles - extract markdown files from the defined project_path or current dir we are on
+//and walk through the path
+func ExtractMarkdownFiles() []string {
+	var markdownFiles []string
 	var err error
 	path := viper.GetString("project_path")
 	if path == "" {
 		path, err = os.Getwd()
 	}
 	if err == nil {
-		log.Info("extracting readme files from path " + path)
+		log.Info("extracting markdown files from path " + path)
 		err = filepath.Walk(path, func(path string, file os.FileInfo, err error) error {
 			if err != nil {
 				log.WithFields(log.Fields{"error": err}).Error("Failed to walk over path: " + path)
@@ -37,7 +40,7 @@ func ExtractReadmeFiles() []string {
 			}
 			if strings.HasSuffix(strings.ToLower(file.Name()), ".md") {
 				path, _ = filepath.Abs(path)
-				readmeFiles = append(readmeFiles, path)
+				markdownFiles = append(markdownFiles, path)
 			}
 			return nil
 		})
@@ -47,17 +50,18 @@ func ExtractReadmeFiles() []string {
 			"error": err,
 		}).Error("Failed to get files")
 	}
-	return readmeFiles
+	return markdownFiles
 }
 
-func ExtractReadmeFilesFromList(filesList []string) []string {
-	var readmeFiles []string
-	log.Info("extracting readme files from list")
+// ExtractMarkdownFilesFromList - extract markdown files from given list
+func ExtractMarkdownFilesFromList(filesList []string) []string {
+	var markdownFiles []string
+	log.Info("extracting markdown files from list")
 	for _, filePath := range filesList {
 		if strings.HasSuffix(strings.ToLower(filePath), ".md") {
 			filePath, _ = filepath.Abs(filePath)
-			readmeFiles = append(readmeFiles, filePath)
+			markdownFiles = append(markdownFiles, filePath)
 		}
 	}
-	return readmeFiles
+	return markdownFiles
 }

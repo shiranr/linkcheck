@@ -19,7 +19,7 @@ func TestFilesWithError(t *testing.T) {
 	basepath := filepath.Dir(b)
 	configPath := basepath + "/resources/linkcheck.json"
 	utils.LoadConfiguration(configPath)
-	readmeFiles := utils.ExtractReadmeFiles()
+	readmeFiles := utils.ExtractMarkdownFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
 	assert.ErrorContains(t, res, "ERROR: 3 links check failed, please check the logs")
 	logFileContent := readLogFile(logFilePath)
