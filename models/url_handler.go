@@ -13,6 +13,7 @@ var (
 type urlHandler struct {
 }
 
+// GetURLHandlerInstance - get instance of URL handler, handle links with http in them (singleton)
 func GetURLHandlerInstance() LinkHandlerInterface {
 	if handler == nil {
 		handler = &urlHandler{}
@@ -20,6 +21,7 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 	return handler
 }
 
+// Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath)
 	for i := 0; i < 2 && err != nil; i++ {

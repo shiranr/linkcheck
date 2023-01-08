@@ -11,6 +11,7 @@ var link = "\\[{1}([é’*&\"|`?'>\\-\\sa-zA-Z0-9@:%._\\\\+~#=,\\n\\/\\(\\)])*((
 
 var urlRegex = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
 
+// LinkProcessor - process a single link, sends it to handler according to its type
 type LinkProcessor interface {
 	CheckLink(filePath string, linkPath string, lineNumber int) *LinkResult
 	ExtractLinks(fileData string) []*linkPath
@@ -42,6 +43,7 @@ func (cache *linksCache) checkLinkCache(linkPath string) (int, bool) {
 
 var lh *linkProcessor
 
+// GetLinkProcessorInstance - get instance of link processor
 func GetLinkProcessorInstance() LinkProcessor {
 	linkOrPath := link + "|" + urlRegex
 	regex, _ := regexp.Compile(linkOrPath)
@@ -57,6 +59,7 @@ func GetLinkProcessorInstance() LinkProcessor {
 	return lh
 }
 
+// CheckLink - check a single link and pass it to its handler according to the type of the link
 func (processor *linkProcessor) CheckLink(filePath string, linkPath string, lineNumber int) *LinkResult {
 	linkData := &LinkResult{
 		lineNumber: lineNumber,
@@ -92,6 +95,7 @@ type linkPath struct {
 	Link           string
 }
 
+// ExtractLinks - extract all the links from a single file
 func (processor *linkProcessor) ExtractLinks(fileData string) []*linkPath {
 	var readmeLinks []string
 	var validLinks []*linkPath

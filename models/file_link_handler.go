@@ -18,6 +18,7 @@ type internalLinkHandler struct {
 	filePath string
 }
 
+// GetInternalLinkHandler - handles internal links
 func GetInternalLinkHandler(filePath string) LinkHandlerInterface {
 	internalLink = &internalLinkHandler{
 		filePath: filePath,
@@ -25,6 +26,7 @@ func GetInternalLinkHandler(filePath string) LinkHandlerInterface {
 	return internalLink
 }
 
+// Handle - handles internal link
 func (handler *internalLinkHandler) Handle(linkPath string) int {
 	folderPath, fileName := filepath.Split(handler.filePath)
 	linkedFileEscapedFullPath := handler.escapedFullPath(folderPath, fileName, linkPath)

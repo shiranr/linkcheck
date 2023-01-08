@@ -14,10 +14,12 @@ type filesProcessor struct {
 	serial bool
 }
 
+// FilesProcessor - process multiple files either parallel or one by one
 type FilesProcessor interface {
 	Process(files []string) error
 }
 
+// GetFilesProcessorInstance - get instance of files processor (Singleton)
 func GetFilesProcessorInstance() FilesProcessor {
 	if fp == nil {
 		fp = &filesProcessor{
@@ -28,6 +30,7 @@ func GetFilesProcessorInstance() FilesProcessor {
 	return fp
 }
 
+// Process - process the multiple files list
 func (fh *filesProcessor) Process(files []string) error {
 	for _, filePath := range files {
 		fileLinkData := FileResultData{

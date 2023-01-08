@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// FileProcessor  - process a single file, get links and check them
 type FileProcessor interface {
 	ProcessFile()
 }
@@ -15,6 +16,7 @@ type fileProcessor struct {
 	fileLinesData map[int]string
 }
 
+// GetNewFileProcessor - get instance of file processor
 func GetNewFileProcessor(filePath string, resultChan chan *LinkResult) FileProcessor {
 	return &fileProcessor{
 		filePath:   filePath,
@@ -22,6 +24,7 @@ func GetNewFileProcessor(filePath string, resultChan chan *LinkResult) FileProce
 	}
 }
 
+// ProcessFile - process a single file
 func (fp *fileProcessor) ProcessFile() {
 	defer wg.Done()
 	linkHandler := GetLinkProcessorInstance()
