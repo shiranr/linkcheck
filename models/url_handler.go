@@ -26,7 +26,7 @@ func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath)
 	for i := 0; i < 2 && err != nil; i++ {
 		errLower := strings.ToLower(err.Error())
-		if strings.Contains(errLower, "eof") {
+		if strings.Contains(errLower, "eof") || strings.Contains(errLower, "timeout") {
 			respStatus, err = handler.scrap(linkPath)
 			if err == nil {
 				return respStatus
@@ -38,9 +38,6 @@ func (handler *urlHandler) Handle(linkPath string) int {
 		}
 		if strings.Contains(errLower, "forbidden") {
 			return 403
-		}
-		if strings.Contains(errLower, "timeout") {
-			return 504
 		}
 		log.WithFields(log.Fields{
 			"link":  linkPath,
