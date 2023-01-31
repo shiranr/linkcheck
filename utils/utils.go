@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+var getDir = os.Getwd
+
 // LoadConfiguration - load configuration file from config path
 func LoadConfiguration(configPath string) {
 	viper.SetConfigFile(configPath)
@@ -26,7 +28,7 @@ func ExtractMarkdownFiles() []string {
 	var err error
 	path := viper.GetString("project_path")
 	if path == "" {
-		path, err = os.Getwd()
+		path, err = getDir()
 	}
 	if err == nil {
 		log.Info("extracting markdown files from path " + path)
