@@ -14,20 +14,22 @@ type fileProcessor struct {
 	resultChan    chan *LinkResult
 	filePath      string
 	fileLinesData map[int]string
+	linkProcessor LinkProcessor
 }
 
 // GetNewFileProcessor - get instance of file processor
-func GetNewFileProcessor(filePath string, resultChan chan *LinkResult) FileProcessor {
+func GetNewFileProcessor(filePath string, resultChan chan *LinkResult, linkProcessor LinkProcessor) FileProcessor {
 	return &fileProcessor{
-		filePath:   filePath,
-		resultChan: resultChan,
+		filePath:      filePath,
+		resultChan:    resultChan,
+		linkProcessor: linkProcessor,
 	}
 }
 
 // ProcessFile - process a single file
 func (fp *fileProcessor) ProcessFile() {
 	defer wg.Done()
-	linkHandler := GetLinkProcessorInstance()
+
 	fileBytes, err := os.ReadFile(fp.filePath)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Error("failed to read file " + fp.filePath)
@@ -41,8 +43,8 @@ func (fp *fileProcessor) ProcessFile() {
 		return
 	}
 	fileData := string(fileBytes)
-	linksPaths := linkHandler.ExtractLinks(fileData)
+	linksPaths := fp.linkProcessor.ExtractLinks(fileData)
 	for _, linkData := range linksPaths {
-		fp.resultChan <- linkHandler.CheckLink(fp.filePath, linkData.Link, linkData.LinkLineNumber)
+		fp.resultChan <- fp.linkProcessor.CheckLink(fp.filePath, linkData.Link, linkData.LinkLineNumber)
 	}
 }

@@ -11,7 +11,8 @@ var fp *filesProcessor
 
 type filesProcessor struct {
 	*Result
-	serial bool
+	serial        bool
+	linkProcessor LinkProcessor
 }
 
 // FilesProcessor - process multiple files either parallel or one by one
@@ -25,6 +26,7 @@ func GetFilesProcessorInstance() FilesProcessor {
 		fp = &filesProcessor{
 			getResult(),
 			viper.GetBool("serial"),
+			GetLinkProcessorInstance(),
 		}
 	}
 	return fp
@@ -39,7 +41,7 @@ func (fh *filesProcessor) Process(files []string) error {
 			Error:    false,
 		}
 		fh.AddNewFile(&fileLinkData)
-		fileProcessor := GetNewFileProcessor(filePath, fh.Channel)
+		fileProcessor := GetNewFileProcessor(filePath, fh.Channel, fh.linkProcessor)
 		if fileProcessor != nil {
 			wg.Add(1)
 			fh.invoke(fileProcessor)
