@@ -17,9 +17,9 @@ func TestExtractMarkdownFilesSuccessfully(t *testing.T) {
 	viper.Set("project_path", "../")
 	files := ExtractMarkdownFiles()
 	assert.Len(t, files, 3)
-	assert.Contains(t, files[0], "/shiranr/linkcheck/README.md")
-	assert.Contains(t, files[1], "/shiranr/linkcheck/tests/resources/MARKDOWN.md")
-	assert.Contains(t, files[2], "/shiranr/linkcheck/tests/resources/another_markdown.md")
+	assert.Contains(t, files[0], "/linkcheck/README.md")
+	assert.Contains(t, files[1], "/linkcheck/tests/resources/MARKDOWN.md")
+	assert.Contains(t, files[2], "/linkcheck/tests/resources/another_markdown.md")
 }
 
 func TestExtractMarkdownFilesFail(t *testing.T) {
