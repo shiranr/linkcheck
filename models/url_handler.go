@@ -24,15 +24,13 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath)
-	for i := 0; i < 2 && (err != nil || respStatus == 504); i++ {
+	for i := 0; i < 2 && (err != nil || respStatus == 504 || respStatus == 0); i++ {
 		errLower := strings.ToLower(err.Error())
-		if strings.Contains(errLower, "eof") || strings.Contains(errLower, "timeout") {
-			respStatus, err = handler.scrap(linkPath)
-			if err == nil {
-				return respStatus
-			}
-			errLower = strings.ToLower(err.Error())
+		respStatus, err = handler.scrap(linkPath)
+		if err == nil {
+			return respStatus
 		}
+		errLower = strings.ToLower(err.Error())
 		if strings.Contains(errLower, "not found") {
 			return 404
 		}
