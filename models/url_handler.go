@@ -34,7 +34,7 @@ func (handler *urlHandler) Handle(linkPath string) int {
 		time.Sleep(500 * time.Millisecond)
 		errLower := strings.ToLower(err.Error())
 		respStatus, err = handler.scrap(linkPath)
-		if err == nil {
+		if err == nil && handler.respStatusOK(respStatus) {
 			return respStatus
 		}
 		errLower = strings.ToLower(err.Error())
