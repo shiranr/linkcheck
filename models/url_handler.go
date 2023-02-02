@@ -24,7 +24,7 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
-	respStatus, err := handler.scrap(linkPath)
+	respStatus, err := handler.scrap(linkPath, false)
 	for i := 0; i < 3 && (err != nil || !handler.respStatusOK(respStatus)); i++ {
 		log.WithFields(log.Fields{
 			"link":       linkPath,
@@ -33,7 +33,7 @@ func (handler *urlHandler) Handle(linkPath string) int {
 		}).Error("Failed get URL data")
 		time.Sleep(500 * time.Millisecond)
 		errLower := strings.ToLower(err.Error())
-		respStatus, err = handler.scrap(linkPath)
+		respStatus, err = handler.scrap(linkPath, true)
 		if err == nil && handler.respStatusOK(respStatus) {
 			return respStatus
 		}
@@ -52,8 +52,11 @@ func (handler *urlHandler) respStatusOK(restStatus int) bool {
 	return restStatus >= 200 && restStatus < 300 || restStatus >= 400 && restStatus < 500
 }
 
-func (handler *urlHandler) scrap(linkPath string) (int, error) {
+func (handler *urlHandler) scrap(linkPath string, retry bool) (int, error) {
 	c := colly.NewCollector()
+	if !retry {
+		c.CheckHead = true
+	}
 	respStatus := 0
 	c.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
