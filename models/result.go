@@ -109,7 +109,7 @@ func (res *Result) Print() error {
 					if link.status != 200 {
 						errCount++
 					}
-					log.Info("Line: " + strconv.Itoa(link.lineNumber) + " link: " + link.path + " status: " + strconv.Itoa(link.status))
+					log.Info("Line " + strconv.Itoa(link.lineNumber) + " link " + link.path + " status " + strconv.Itoa(link.status))
 					log.Info("")
 				}
 			}
