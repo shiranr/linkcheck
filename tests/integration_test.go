@@ -24,9 +24,9 @@ func TestFilesWithError(t *testing.T) {
 	assert.ErrorContains(t, res, "ERROR: 3 links check failed, please check the logs")
 	logFileContent := readLogFile(logFilePath)
 	assert.Contains(t, logFileContent, "Went through 2 files")
-	assert.Contains(t, logFileContent, "Line: 21 link: nla.go status: 400")
-	assert.Contains(t, logFileContent, "Line: 33 link: source-control/merge-strategies.md status: 400")
-	assert.Contains(t, logFileContent, "Line: 33 link: resources/templates/CONTRIBUTING.md status: 400")
+	assert.Contains(t, logFileContent, "Line 21 link nla.go status 400")
+	assert.Contains(t, logFileContent, "Line 33 link source-control/merge-strategies.md status 400")
+	assert.Contains(t, logFileContent, "Line 33 link resources/templates/CONTRIBUTING.md status 400")
 	assert.NotContains(t, logFileContent, "http://bla.com/")
 	assert.NotContains(t, logFileContent, "http://test.com/")
 

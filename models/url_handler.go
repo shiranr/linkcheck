@@ -23,14 +23,16 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
-	respStatus, err := handler.scrap(linkPath, true)
+	respStatus, err := handler.scrap(linkPath)
 	for i := 0; i < 2 && err != nil; i++ {
 		errLower := strings.ToLower(err.Error())
-		respStatus, err = handler.scrap(linkPath, false)
-		if err == nil {
-			return respStatus
+		if strings.Contains(errLower, "eof") || strings.Contains(errLower, "timeout") {
+			respStatus, err = handler.scrap(linkPath)
+			if err == nil {
+				return respStatus
+			}
+			errLower = strings.ToLower(err.Error())
 		}
-		errLower = strings.ToLower(err.Error())
 		if strings.Contains(errLower, "not found") {
 			return 404
 		}
@@ -48,13 +50,8 @@ func (handler *urlHandler) Handle(linkPath string) int {
 	return respStatus
 }
 
-func (handler *urlHandler) respStatusOK(restStatus int) bool {
-	return restStatus >= 200 && restStatus < 300 || restStatus >= 400 && restStatus < 500
-}
-
-func (handler *urlHandler) scrap(linkPath string, checkHead bool) (int, error) {
+func (handler *urlHandler) scrap(linkPath string) (int, error) {
 	c := colly.NewCollector()
-	c.CheckHead = checkHead
 	respStatus := 0
 	c.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
