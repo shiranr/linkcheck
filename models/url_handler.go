@@ -23,10 +23,10 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
-	respStatus, err := handler.scrap(linkPath, false)
+	respStatus, err := handler.scrap(linkPath, true)
 	for i := 0; i < 2 && err != nil; i++ {
 		errLower := strings.ToLower(err.Error())
-		respStatus, err = handler.scrap(linkPath, true)
+		respStatus, err = handler.scrap(linkPath, false)
 		if err == nil {
 			return respStatus
 		}
@@ -52,11 +52,9 @@ func (handler *urlHandler) respStatusOK(restStatus int) bool {
 	return restStatus >= 200 && restStatus < 300 || restStatus >= 400 && restStatus < 500
 }
 
-func (handler *urlHandler) scrap(linkPath string, retry bool) (int, error) {
+func (handler *urlHandler) scrap(linkPath string, checkHead bool) (int, error) {
 	c := colly.NewCollector()
-	if !retry {
-		c.CheckHead = true
-	}
+	c.CheckHead = checkHead
 	respStatus := 0
 	c.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
