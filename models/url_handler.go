@@ -11,12 +11,15 @@ var (
 )
 
 type urlHandler struct {
+	collector *colly.Collector
 }
 
 // GetURLHandlerInstance - get instance of URL handler, handle links with http in them (singleton)
 func GetURLHandlerInstance() LinkHandlerInterface {
 	if handler == nil {
-		handler = &urlHandler{}
+		handler = &urlHandler{
+			colly.NewCollector(),
+		}
 	}
 	return handler
 }
@@ -48,10 +51,9 @@ func (handler *urlHandler) Handle(linkPath string) int {
 }
 
 func (handler *urlHandler) scrap(linkPath string) (int, error) {
-	c := colly.NewCollector()
 	respStatus := 0
-	c.OnResponse(func(resp *colly.Response) {
+	handler.collector.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
 	})
-	return respStatus, c.Visit(linkPath)
+	return respStatus, handler.collector.Visit(linkPath)
 }
