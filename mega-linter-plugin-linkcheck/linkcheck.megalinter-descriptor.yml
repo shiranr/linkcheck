@@ -25,5 +25,4 @@ linters:
       - "linkcheck --config linkcheck.json README.md"
     install:
       dockerfile:
-        - RUN export GO111MODULE=on
-        - RUN go install github.com/shiranr/linkcheck@latest && go clean --cache
+        - RUN export GO111MODULE=on && go install github.com/shiranr/linkcheck@latest && go clean --cache
