@@ -4,7 +4,6 @@ import (
 	"github.com/gocolly/colly"
 	log "github.com/sirupsen/logrus"
 	"strings"
-	"time"
 )
 
 var (
@@ -25,16 +24,10 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath, false)
-	for i := 0; i < 3 && (err != nil || !handler.respStatusOK(respStatus)); i++ {
-		log.WithFields(log.Fields{
-			"link":       linkPath,
-			"error":      err,
-			"respStatus": respStatus,
-		}).Error("Failed get URL data")
-		time.Sleep(500 * time.Millisecond)
+	for i := 0; i < 2 && err != nil; i++ {
 		errLower := strings.ToLower(err.Error())
 		respStatus, err = handler.scrap(linkPath, true)
-		if err == nil && handler.respStatusOK(respStatus) {
+		if err == nil {
 			return respStatus
 		}
 		errLower = strings.ToLower(err.Error())
@@ -44,6 +37,13 @@ func (handler *urlHandler) Handle(linkPath string) int {
 		if strings.Contains(errLower, "forbidden") {
 			return 403
 		}
+		if strings.Contains(errLower, "timeout") {
+			return 504
+		}
+		log.WithFields(log.Fields{
+			"link":  linkPath,
+			"error": err,
+		}).Error("Failed get URL data")
 	}
 	return respStatus
 }
