@@ -116,7 +116,7 @@ func (res *Result) Print() error {
 		}
 	}
 	if errCount > 0 {
-		errMsg := "*** ERROR: " + strconv.Itoa(errCount) + " links check failed, please check the logs ***"
+		errMsg := "ERROR: " + strconv.Itoa(errCount) + " links check failed, please check the logs"
 		return errors.New(errMsg)
 	}
 	return nil

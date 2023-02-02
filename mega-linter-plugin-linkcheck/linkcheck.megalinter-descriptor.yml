@@ -18,7 +18,7 @@ linters:
     cli_lint_mode: list_of_files
     lint_all_files: true
     cli_lint_errors_count: regex_sum
-    cli_lint_errors_regex: "*** ERROR: ([0-9]+) links check failed, please check the logs ***"
+    cli_lint_errors_regex: "ERROR: ([0-9]+) links check failed, please check the logs"
     examples:
       - "linkcheck"
       - "linkcheck README.md"
