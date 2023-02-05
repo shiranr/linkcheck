@@ -30,15 +30,17 @@ func (handler *urlHandler) Handle(linkPath string) int {
 			"error": err,
 		}).Error("Failed get URL data, retrying")
 		respStatus, err = handler.scrap(linkPath, false)
-		errLower := strings.ToLower(err.Error())
-		if strings.Contains(errLower, "not found") {
-			return 404
-		}
-		if strings.Contains(errLower, "forbidden") {
-			return 403
-		}
-		if strings.Contains(errLower, "timeout") {
-			return 504
+		if err != nil {
+			errLower := strings.ToLower(err.Error())
+			if strings.Contains(errLower, "not found") {
+				return 404
+			}
+			if strings.Contains(errLower, "forbidden") {
+				return 403
+			}
+			if strings.Contains(errLower, "timeout") {
+				return 504
+			}
 		}
 	}
 	return respStatus
