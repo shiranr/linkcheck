@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/gocolly/colly"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -38,19 +39,19 @@ func (handler *urlHandler) Handle(linkPath string) int {
 	return respStatus
 }
 
-func (handler *urlHandler) scrap(linkPath string, headFirst bool) (int, error) {
+func (handler *urlHandler) scrap(linkPath string, retry bool) (int, error) {
 	var err error
 	c := colly.NewCollector()
 	respStatus := 0
 	c.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
 	})
-	if headFirst {
-		c.CheckHead = true
-		err = c.Visit(linkPath)
-	}
-	if err != nil || respStatus == 0 {
-		c.CheckHead = false
+	err = c.Visit(linkPath)
+	if retry && (err != nil || respStatus == 0) {
+		log.WithFields(log.Fields{
+			"link":  linkPath,
+			"error": err,
+		}).Error("Failed get URL data, retrying")
 		err = c.Visit(linkPath)
 	}
 	return respStatus, err
