@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/gocolly/colly"
-	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -24,23 +23,16 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
 	respStatus, err := handler.scrap(linkPath, true)
-	if err != nil || respStatus == 0 {
-		log.WithFields(log.Fields{
-			"link":  linkPath,
-			"error": err,
-		}).Error("Failed get URL data, retrying")
-		respStatus, err = handler.scrap(linkPath, false)
-		if err != nil {
-			errLower := strings.ToLower(err.Error())
-			if strings.Contains(errLower, "not found") {
-				return 404
-			}
-			if strings.Contains(errLower, "forbidden") {
-				return 403
-			}
-			if strings.Contains(errLower, "timeout") {
-				return 504
-			}
+	if err != nil {
+		errLower := strings.ToLower(err.Error())
+		if strings.Contains(errLower, "not found") {
+			return 404
+		}
+		if strings.Contains(errLower, "forbidden") {
+			return 403
+		}
+		if strings.Contains(errLower, "timeout") {
+			return 504
 		}
 	}
 	return respStatus
