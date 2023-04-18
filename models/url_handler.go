@@ -23,16 +23,9 @@ func GetURLHandlerInstance() LinkHandlerInterface {
 
 // Handle - using scrap lib, check the link status
 func (handler *urlHandler) Handle(linkPath string) int {
-	respStatus, err := handler.scrap(linkPath)
-	for i := 0; i < 2 && err != nil; i++ {
+	respStatus, err := handler.scrap(linkPath, true)
+	if err != nil {
 		errLower := strings.ToLower(err.Error())
-		if strings.Contains(errLower, "eof") || strings.Contains(errLower, "timeout") {
-			respStatus, err = handler.scrap(linkPath)
-			if err == nil {
-				return respStatus
-			}
-			errLower = strings.ToLower(err.Error())
-		}
 		if strings.Contains(errLower, "not found") {
 			return 404
 		}
@@ -42,19 +35,24 @@ func (handler *urlHandler) Handle(linkPath string) int {
 		if strings.Contains(errLower, "timeout") {
 			return 504
 		}
-		log.WithFields(log.Fields{
-			"link":  linkPath,
-			"error": err,
-		}).Error("Failed get URL data")
 	}
 	return respStatus
 }
 
-func (handler *urlHandler) scrap(linkPath string) (int, error) {
+func (handler *urlHandler) scrap(linkPath string, retry bool) (int, error) {
+	var err error
 	c := colly.NewCollector()
 	respStatus := 0
 	c.OnResponse(func(resp *colly.Response) {
 		respStatus = resp.StatusCode
 	})
-	return respStatus, c.Visit(linkPath)
+	err = c.Visit(linkPath)
+	if retry && (err != nil || respStatus == 0) {
+		log.WithFields(log.Fields{
+			"link":  linkPath,
+			"error": err,
+		}).Error("Failed get URL data, retrying")
+		err = c.Visit(linkPath)
+	}
+	return respStatus, err
 }
