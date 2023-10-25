@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/gob"
 	"github.com/spf13/viper"
+	"math/rand"
 	"os"
 	"sync"
 	"time"
@@ -15,12 +16,14 @@ type LinksCache struct {
 	linksCache map[string]*LinkData
 	mapLock    sync.RWMutex
 	duration   time.Duration
+	runNumber  uint64
 }
 
 type LinkData struct {
 	ResponseStatus int
 	LastChecked    int64
 	LinkPath       string
+	RunNumber      uint64
 }
 
 // Please notice this is not thread safe
@@ -34,6 +37,7 @@ func GetCacheInstance(customFilePath string, empty bool) *LinksCache {
 			linksCache: make(map[string]*LinkData),
 			mapLock:    sync.RWMutex{},
 			duration:   duration,
+			runNumber:  rand.Uint64(),
 		}
 		if !empty {
 			cache.loadCacheData()
@@ -75,7 +79,12 @@ func (c *LinksCache) AddLink(linkPath string, status int) {
 			ResponseStatus: status,
 			LastChecked:    time.Now().Unix(),
 			LinkPath:       linkPath,
+			RunNumber:      c.runNumber,
 		}
+	} else {
+		data.ResponseStatus = status
+		data.RunNumber = c.runNumber
+		data.LastChecked = time.Now().Unix()
 	}
 	c.linksCache[linkPath] = data
 }
@@ -92,6 +101,9 @@ func (c *LinksCache) IsTimeCachedElapsed(linkPath string) bool {
 
 func (c *LinksCache) checkTimeElapsed(val *LinkData) bool {
 	if val.LastChecked+int64(c.duration.Seconds()) < time.Now().Unix() {
+		return true
+	}
+	if val.RunNumber != c.runNumber && (299 < val.ResponseStatus || val.ResponseStatus < 200) {
 		return true
 	}
 	return false
