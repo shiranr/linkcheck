@@ -47,6 +47,8 @@ func (fh *filesProcessor) Process(files []string) error {
 	}
 	wg.Wait()
 	fh.Close()
+	cache := GetCacheInstance("", false)
+	cache.Close()
 	return fh.Print()
 }
 
