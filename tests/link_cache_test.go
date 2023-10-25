@@ -32,13 +32,13 @@ func TestCacheIsNotNil(t *testing.T) {
 }
 
 func TestAddingDataToCache(t *testing.T) {
-	respStat, ok := cache.CheckLinkCache("test")
+	respStat, ok := cache.CheckLinkStatus("test")
 	assert.Equal(t, respStat, 0)
 	assert.False(t, ok)
 	cache.AddLink("test", 200)
 	cache.Close()
 	cache = models.GetCacheInstance("resources/test_cache", false)
-	respStat, ok = cache.CheckLinkCache("test")
+	respStat, ok = cache.CheckLinkStatus("test")
 	assert.Equal(t, respStat, 200)
 	assert.True(t, ok)
 }

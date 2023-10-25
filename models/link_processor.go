@@ -46,7 +46,7 @@ func (processor *linkProcessor) CheckLink(filePath string, linkPath string, line
 		path:       linkPath,
 		filePath:   filePath,
 	}
-	status, ok := processor.CheckLinkCache(linkPath)
+	status, ok := processor.CheckLinkStatus(linkPath)
 	if !ok {
 		switch {
 		case strings.HasPrefix(linkData.path, "http"):

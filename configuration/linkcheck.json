@@ -1,5 +1,6 @@
 {
   "exclude_links": [],
   "only_errors": true,
-  "serial": false
+  "serial": false,
+  "cache_duration": "24h"
 }
