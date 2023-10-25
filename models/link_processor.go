@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/viper"
 	"regexp"
 	"strings"
-	"sync"
 )
 
 var link = "\\[{1}([é’*&\"|`?'>\\-\\sa-zA-Z0-9@:%._\\\\+~#=,\\n\\/\\(\\)])*((\\]\\()){1}([?\\sa-zA-Z0-9@:%._\\\\+~#=\\/\\/\\-]{1,256}(\\(.*\\))?(\\\"(.*)\\\")?)\\){1}"
@@ -18,27 +17,9 @@ type LinkProcessor interface {
 }
 
 type linkProcessor struct {
-	linksCache
+	LinksCache
 	mdLinkRegex   *regexp.Regexp
 	excludedLinks []string
-}
-
-type linksCache struct {
-	linksCache map[string]int
-	mapLock    sync.RWMutex
-}
-
-func (cache *linksCache) addLink(linkPath string, status int) {
-	cache.mapLock.Lock()
-	defer cache.mapLock.Unlock()
-	cache.linksCache[linkPath] = status
-}
-
-func (cache *linksCache) checkLinkCache(linkPath string) (int, bool) {
-	cache.mapLock.RLock()
-	defer cache.mapLock.RUnlock()
-	val, ok := cache.linksCache[linkPath]
-	return val, ok
 }
 
 var lh *linkProcessor
@@ -49,11 +30,9 @@ func GetLinkProcessorInstance() LinkProcessor {
 	regex, _ := regexp.Compile(linkOrPath)
 	if lh == nil {
 		lh = &linkProcessor{
-			linksCache{
-				linksCache: map[string]int{},
-			},
-			regex,
-			viper.GetStringSlice("exclude_links"),
+			LinksCache:    *GetCacheInstance("", false),
+			mdLinkRegex:   regex,
+			excludedLinks: viper.GetStringSlice("exclude_links"),
 		}
 	}
 	return lh
@@ -67,7 +46,7 @@ func (processor *linkProcessor) CheckLink(filePath string, linkPath string, line
 		path:       linkPath,
 		filePath:   filePath,
 	}
-	status, ok := processor.checkLinkCache(linkPath)
+	status, ok := processor.CheckLinkCache(linkPath)
 	if !ok {
 		switch {
 		case strings.HasPrefix(linkData.path, "http"):
@@ -83,7 +62,7 @@ func (processor *linkProcessor) CheckLink(filePath string, linkPath string, line
 			fileLinkHandler := GetInternalLinkHandler(filePath)
 			linkData.status = fileLinkHandler.Handle(linkPath)
 		}
-		processor.addLink(linkPath, linkData.status)
+		processor.AddLink(linkPath, linkData.status)
 	} else {
 		linkData.status = status
 	}
