@@ -2,8 +2,10 @@ package tests
 
 import (
 	"github.com/shiranr/linkcheck/models"
+	"github.com/shiranr/linkcheck/utils"
 	"github.com/stretchr/testify/assert"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -16,6 +18,10 @@ func getFilePath() string {
 }
 
 func init() {
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
+	configPath := basepath + "/resources/linkcheck.json"
+	utils.LoadConfiguration(configPath)
 	path := getFilePath()
 	cache = models.GetCacheInstance(path, true)
 	cache.SaveCache()

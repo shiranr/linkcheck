@@ -3,5 +3,6 @@
     "https://test.com",
     "http://bla.com/"
   ],
-  "only_errors": false
+  "only_errors": false,
+  "cache_duration": "24h"
 }

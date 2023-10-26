@@ -28,8 +28,8 @@ type LinkData struct {
 
 // Please notice this is not thread safe
 func GetCacheInstance(customFilePath string, empty bool) *LinksCache {
-	duration := viper.GetDuration("cache_duration")
 	if cache == nil {
+		duration := viper.GetDuration("cache_duration")
 		if customFilePath != "" {
 			filePath = customFilePath
 		}
