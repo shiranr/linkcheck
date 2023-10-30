@@ -8,20 +8,16 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-	"runtime"
 	"testing"
 )
 
 func TestFilesWithError(t *testing.T) {
-	_, b, _, _ := runtime.Caller(0)
-	logFilePath := setLogFile()
-	basepath := filepath.Dir(b)
-	configPath := basepath + "/resources/linkcheck.json"
-	utils.LoadConfiguration(configPath)
+	cache := models.GetCacheInstance(true)
+	validateLinkInCache(t, cache, "https://github.com/apache/jmeter", 0, false)
 	readmeFiles := utils.ExtractMarkdownFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
 	assert.ErrorContains(t, res, "ERROR: 3 links check failed, please check the logs")
+	logFilePath := setLogFile()
 	logFileContent := readLogFile(logFilePath)
 	assert.Contains(t, logFileContent, "Went through 2 files")
 	assert.Contains(t, logFileContent, "Line 21 link nla.go status 400")
@@ -29,7 +25,17 @@ func TestFilesWithError(t *testing.T) {
 	assert.Contains(t, logFileContent, "Line 33 link resources/templates/CONTRIBUTING.md status 400")
 	assert.NotContains(t, logFileContent, "http://bla.com/")
 	assert.NotContains(t, logFileContent, "http://test.com/")
+	cache = models.GetCacheInstance(false)
+	validateLinkInCache(t, cache, "http://bla.com/", 0, false)
+	validateLinkInCache(t, cache, "http://test.com/", 0, false)
+	validateLinkInCache(t, cache, "https://github.com/apache/jmeter", 200, true)
 
+}
+
+func validateLinkInCache(t *testing.T, cache *models.LinksCache, linkPath string, expectedStatus int, isOk bool) {
+	status, ok := cache.CheckLinkStatus(linkPath)
+	assert.Equal(t, ok, isOk)
+	assert.Equal(t, status, expectedStatus)
 }
 
 func readLogFile(filePath string) string {
