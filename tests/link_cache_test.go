@@ -11,25 +11,17 @@ import (
 
 var cache *models.LinksCache
 
-func getFilePath() string {
-	basePath, _ := filepath.Abs(".")
-	path := filepath.Join(basePath, "resources/test_cache")
-	return path
-}
-
 func init() {
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	configPath := basepath + "/resources/linkcheck.json"
 	utils.LoadConfiguration(configPath)
-	path := getFilePath()
-	cache = models.GetCacheInstance(path, true)
+	cache = models.GetCacheInstance(true)
 	cache.SaveCache()
 }
 
 func TestInstancesAreTheSame(t *testing.T) {
-	path := getFilePath()
-	cache2 := models.GetCacheInstance(path, false)
+	cache2 := models.GetCacheInstance(false)
 	assert.Equal(t, cache, cache2)
 }
 
@@ -43,7 +35,7 @@ func TestAddingDataToCache(t *testing.T) {
 	assert.False(t, ok)
 	cache.AddLink("test", 200)
 	cache.Close()
-	cache = models.GetCacheInstance("resources/test_cache", false)
+	cache = models.GetCacheInstance(false)
 	respStat, ok = cache.CheckLinkStatus("test")
 	assert.Equal(t, respStat, 200)
 	assert.True(t, ok)

@@ -30,7 +30,7 @@ func GetLinkProcessorInstance() LinkProcessor {
 	regex, _ := regexp.Compile(linkOrPath)
 	if lh == nil {
 		lh = &linkProcessor{
-			LinksCache:    *GetCacheInstance("", false),
+			LinksCache:    *GetCacheInstance(false),
 			mdLinkRegex:   regex,
 			excludedLinks: viper.GetStringSlice("exclude_links"),
 		}

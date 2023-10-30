@@ -12,7 +12,7 @@ import (
 )
 
 func TestFilesWithError(t *testing.T) {
-	cache := models.GetCacheInstance("", true)
+	cache := models.GetCacheInstance(true)
 	validateLinkInCache(t, cache, "https://github.com/apache/jmeter", 0, false)
 	readmeFiles := utils.ExtractMarkdownFiles()
 	res := models.GetFilesProcessorInstance().Process(readmeFiles)
@@ -25,7 +25,7 @@ func TestFilesWithError(t *testing.T) {
 	assert.Contains(t, logFileContent, "Line 33 link resources/templates/CONTRIBUTING.md status 400")
 	assert.NotContains(t, logFileContent, "http://bla.com/")
 	assert.NotContains(t, logFileContent, "http://test.com/")
-	cache = models.GetCacheInstance("", false)
+	cache = models.GetCacheInstance(false)
 	validateLinkInCache(t, cache, "http://bla.com/", 0, false)
 	validateLinkInCache(t, cache, "http://test.com/", 0, false)
 	validateLinkInCache(t, cache, "https://github.com/apache/jmeter", 200, true)

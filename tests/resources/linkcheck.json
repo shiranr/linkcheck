@@ -4,5 +4,6 @@
     "http://bla.com/"
   ],
   "only_errors": false,
-  "cache_duration": "24h"
+  "cache_duration": "24h",
+  "cache_output_path": "resources/test_cache"
 }

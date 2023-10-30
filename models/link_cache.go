@@ -10,7 +10,7 @@ import (
 )
 
 var cache *LinksCache
-var filePath = "../cache_store/cache"
+var filePath string
 
 type LinksCache struct {
 	linksCache map[string]*LinkData
@@ -27,12 +27,10 @@ type LinkData struct {
 }
 
 // Please notice this is not thread safe
-func GetCacheInstance(customFilePath string, empty bool) *LinksCache {
+func GetCacheInstance(empty bool) *LinksCache {
 	if cache == nil {
+		filePath = viper.GetString("cache_output_path")
 		duration := viper.GetDuration("cache_duration")
-		if customFilePath != "" {
-			filePath = customFilePath
-		}
 		cache = &LinksCache{
 			linksCache: make(map[string]*LinkData),
 			mapLock:    sync.RWMutex{},
