@@ -57,6 +57,7 @@ func (c *LinksCache) loadCacheData() {
 		log.Error("File " + filePath + " does not exist, skipping cache load")
 		return
 	}
+	log.Info("Opening cache file " + filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
