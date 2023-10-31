@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/gob"
+	"errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"math/rand"
 	"os"
@@ -38,6 +40,7 @@ func GetCacheInstance(empty bool) *LinksCache {
 			runNumber:  rand.Uint64(),
 		}
 		if !empty {
+			log.Info("Loading cache data from " + filePath)
 			cache.loadCacheData()
 		}
 	}
@@ -50,6 +53,10 @@ func (c *LinksCache) Close() {
 }
 
 func (c *LinksCache) loadCacheData() {
+	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+		log.Error("File " + filePath + " does not exist, skipping cache load")
+		return
+	}
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
