@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -54,7 +55,7 @@ func (c *LinksCache) Close() {
 
 func (c *LinksCache) loadCacheData() {
 	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
-		log.Error("File " + filePath + " does not exist, skipping cache load")
+		log.Error("File "+filePath+" does not exist, skipping cache load", err)
 		return
 	}
 	log.Info("Opening cache file " + filePath)
@@ -67,6 +68,11 @@ func (c *LinksCache) loadCacheData() {
 }
 
 func (c *LinksCache) SaveCache() {
+	basePath := filepath.Base(filePath)
+	if err := os.MkdirAll(filepath.Dir(basePath), 0770); err != nil {
+		log.Error("Failed to create path for cache file "+filePath, err)
+		return
+	}
 	file, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
