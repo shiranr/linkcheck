@@ -77,7 +77,6 @@ func (c *LinksCache) SaveCache() {
 	}
 	if _, err := os.Stat(basePath); errors.Is(err, os.ErrNotExist) {
 		log.Error("Folder "+basePath+" does not exist, skipping cache save", err)
-		return
 	}
 	filepath.Walk("/", func(name string, info os.FileInfo, err error) error {
 		if strings.Contains(name, "megalinter-reports") {
