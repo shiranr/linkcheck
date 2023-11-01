@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -75,7 +76,9 @@ func (c *LinksCache) SaveCache() {
 		return
 	}
 	filepath.Walk("/", func(name string, info os.FileInfo, err error) error {
-		log.Info(name)
+		if strings.Contains(name, "megalinter-reports") {
+			log.Info(name)
+		}
 		return nil
 	})
 	file, err := os.Create(filePath)
