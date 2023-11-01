@@ -71,7 +71,7 @@ func (c *LinksCache) loadCacheData() {
 func (c *LinksCache) SaveCache() {
 	basePath := filepath.Dir(filePath)
 	log.Info("Creating file path " + basePath)
-	if err := os.MkdirAll(filepath.Dir(basePath), 0777); err != nil {
+	if err := os.MkdirAll(filepath.Dir(basePath), os.ModePerm); err != nil {
 		log.Error("Failed to create path for cache file "+filePath, err)
 		return
 	}
