@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 )
@@ -71,19 +70,6 @@ func (c *LinksCache) loadCacheData() {
 func (c *LinksCache) SaveCache() {
 	basePath := filepath.Dir(filePath)
 	log.Info("Creating file path " + basePath)
-	if err := os.MkdirAll(filepath.Dir(basePath), os.ModePerm); err != nil {
-		log.Error("Failed to create path for cache file "+filePath, err)
-		return
-	}
-	if _, err := os.Stat(basePath); errors.Is(err, os.ErrNotExist) {
-		log.Error("Folder "+basePath+" does not exist, skipping cache save", err)
-	}
-	filepath.Walk("/", func(name string, info os.FileInfo, err error) error {
-		if strings.Contains(name, "megalinter-reports") {
-			log.Info(name)
-		}
-		return nil
-	})
 	file, err := os.Create(filePath)
 	if err != nil {
 		panic(err)
