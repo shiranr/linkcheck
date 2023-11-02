@@ -69,10 +69,11 @@ func (c *LinksCache) loadCacheData() {
 
 func (c *LinksCache) SaveCache() {
 	basePath := filepath.Dir(filePath)
-	log.Info("Creating file path " + basePath)
+	log.Info("Saving cache to path " + basePath)
 	file, err := os.Create(filePath)
 	if err != nil {
-		panic(err)
+		log.Error("Failed to save cache to  "+basePath, err)
+		return
 	}
 	defer file.Close()
 
