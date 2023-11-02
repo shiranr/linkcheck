@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"sync"
 )
@@ -32,6 +33,7 @@ func GetFilesProcessorInstance() FilesProcessor {
 
 // Process - process the multiple files list
 func (fh *filesProcessor) Process(files []string) error {
+	log.Info("Starting to process links")
 	for _, filePath := range files {
 		fileLinkData := FileResultData{
 			FilePath: filePath,
@@ -47,9 +49,10 @@ func (fh *filesProcessor) Process(files []string) error {
 	}
 	wg.Wait()
 	fh.Close()
+	result := fh.Print()
 	cache := GetCacheInstance(false)
 	cache.Close()
-	return fh.Print()
+	return result
 }
 
 func (fh *filesProcessor) invoke(fileProcessor FileProcessor) {

@@ -17,6 +17,7 @@ import (
 // TODO fix readme
 // TODO mock external server behavior
 func main() {
+	log.Info("Starting linkcheck")
 	start := time.Now()
 	log.SetLevel(log.InfoLevel)
 	_, b, _, _ := runtime.Caller(0)
